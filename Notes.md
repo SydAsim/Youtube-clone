@@ -61,3 +61,53 @@ should be available anywhere we are using it
 # dbconnection
 make sure the ./.env and other imports are correct main issue is in syntax 
 not mongodb 
+
+# Custom api response and error handling
+how we can handle repetitive errors by handling it in custom classes and  functions and handle errors gracefully in utils 
+
+# asyncHandler 
+inthis type function we handles asynchrounous calls when requests are made
+
+# ApiResponse 
+we handle how the response should be when the api is successfull in ApiResponse
+by sending success message payload (data) success status etc
+
+# ApiError 
+when api fails 
+
+# Cloudinary
+
+
+# connect mongodb with your backendserver 
+to do that we will do that we can do that in the index.js file or server.js main file where the connectDB() method is called which was returning a Promise .the().catch()
+
+# cors and Cookie parser 
+
+we use cookie-parser for 
+// app.use() used for when we use middlewares 
+// To read cookies easily in Express routes.
+// To access JWT tokens stored in cookies (for authentication).
+// To track sessions.
+// To implement “Remember me” or auto-login functionality.
+
+and cors for 
+cors (Cross-Origin Resource Sharing)
+🔹 What it is
+cors is an Express middleware that enables cross-origin communication between frontend and backen
+By default, browsers block requests from a frontend hosted on one domain to a backend hosted on another.
+For example:
+Frontend (React): http://localhost:3000
+Backend (Node/Express): http://localhost:8000
+→ Without CORS, this gives you an error:
+Access to fetch at 'http://localhost:8000/api' from origin 'http://localhost:3000' has been blocked by CORS policy
+🔹 How it works
+When you add:
+import cors from "cors";
+app.use(cors());
+
+It automatically adds special HTTP headers like:
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: GET, POST, PUT, DELETE
+Access-Control-Allow-Headers: Content-Type, Authorization
+These tell the browser:
+“It’s safe to allow this request from another origin.”
