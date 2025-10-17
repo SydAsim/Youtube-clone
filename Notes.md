@@ -37,3 +37,13 @@ commonjs to
  # dev dep vs dep 
  in dev dep we mean in development what we need or require it just for our ease or use there is no effect of it development
 
+# Prettier 
+in Professional grade code we use it 
+We use Prettier primarily to avoid merge conflicts due to spaces, commas, indentation, etc., and to maintain consistent, clean code across a production-grade codebase. so if the source code is same then it will just ignore what we want to be ignored
+
+# prettierrc 
+we define in it what to keep in mind in order to keep track of the 
+commas etc 
+
+# prettierignore 
+we tell in this file that keep out of this file meaning do not apply any change in it 
