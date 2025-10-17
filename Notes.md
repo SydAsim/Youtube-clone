@@ -57,3 +57,7 @@ it in index.js other is directly connecting the db in a function in index.js
 # dotenv 
 to load env vaiables as early as possible so when app is runs the env 
 should be available anywhere we are using it 
+
+# dbconnection
+make sure the ./.env and other imports are correct main issue is in syntax 
+not mongodb 
