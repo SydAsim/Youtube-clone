@@ -111,3 +111,7 @@ Access-Control-Allow-Methods: GET, POST, PUT, DELETE
 Access-Control-Allow-Headers: Content-Type, Authorization
 These tell the browser:
 “It’s safe to allow this request from another origin.”
+
+# models 
+imported make through moongose which handles our mongoosedatabase
+
