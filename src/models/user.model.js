@@ -72,6 +72,11 @@ userSchema.methods.isPasswordCorrect = async function (password) {
 }
 
 
+
+// The user's details (like id, email, and username) already exist in the database.
+// We include some of them in the JWT payload to identify the user when verifying the token later.
+//But we’re not “checking” them in this function — we’re embedding them in the token payload so
+//that when the client sends this token later, the backend can verify who the user is without re-checking the database every time.
 userSchema.methods.generateAccessToken = function ()
 {
     return jwt.sign(
@@ -79,7 +84,6 @@ userSchema.methods.generateAccessToken = function ()
             _id:this._id,
             email:this.email,
             username:this.username,
-            password:this.password
         },
         process.env.ACCESS_TOKEN_SECRET,
         {
@@ -100,13 +104,6 @@ userSchema.methods.generateRefreshToken = function ()
         }
     )
 }
-
-
-
-
-
-
-
 
 
 export const User = mongoose.model("User" ,userSchema)

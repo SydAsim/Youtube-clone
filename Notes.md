@@ -115,3 +115,37 @@ These tell the browser:
 # models 
 imported make through moongose which handles our mongoosedatabase
 
+# npm i mongoose-aggregate-paginate-v2
+
+It’s a Mongoose plugin that adds pagination (page-wise data loading) support for aggregation pipelines in MongoDB.
+The package does not upload or store data —
+it helps your backend load (fetch) limited chunks of data from MongoDB efficiently.
+It’s purely for data reading (loading), not data uploading (inserting).
+
+# jwt 
+is a BearerToken if you have it then i will give you my access
+Once the user’s email and password are verified, the backend creates a JWT (JSON Web Token) using a secret key.
+This token contains the user’s ID, email, and username — and is signed so it can’t be tampered with.
+
+The token acts as a temporary digital ID, allowing the user to make further requests without re-entering their password until it expires
+// The user's details (like id, email, and username) already exist in the database.
+// We include some of them in the JWT payload to identify the user when verifying the token later.
+//But we’re not “checking” them in this function — we’re embedding them in the token payload so
+//that when the client sends this token later, the backend can verify who the user is without re-checking the database every time.
+
+# cloudinary
+we will import the CLOUDINARY_API_SECRET and CLOUDINARY_API_KEY and CLOUDINARY_CLOUD_NAME from the cloudinary and also make the cloudinary 
+util for easy hanling the like uploadonCloudinary() method 
+
+# fs 
+buid in filehandling in node we will use the unlink method
+
+# multer 
+Multer is a node.js middleware for handling multipart/form-data, which is primarily used for uploading files. It is written on top of busboy for maximum efficiency.
+// Client sends file → Multer triggers diskStorage() →
+// destination(req, file, cb) → set folder
+// filename(req, file, cb) → set name
+// → File is written → req.file attached → next middleware
+
+# controllers 
+now till project is setup now we can wrtie controllers and routes 

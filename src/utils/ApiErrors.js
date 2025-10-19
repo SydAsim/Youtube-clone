@@ -1,5 +1,5 @@
 // Error is a built-in JavaScript class, and we’re extending it to create our own custom error type.
-class ApiErrors extends Error {
+class ApiError extends Error {
     constructor
     (
         statusCode,
@@ -25,7 +25,7 @@ class ApiErrors extends Error {
 
 
 }
-export {ApiErrors}
+export {ApiError}
 
 
 
