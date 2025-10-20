@@ -14,7 +14,7 @@ app.use(cors({
 
 app.use(express.json({limit:"16kb"}))
 app.use(express.urlencoded({extended:true  // urlencoded handles the username or any search words into special characters like   spaceing etc %20
-    ,limit: "20kb",
+    ,limit: "20kb"
 }))
 app.use(express.static("public")) // static store images files etc in ur own server 
 app.use(cookieParser())
@@ -22,7 +22,7 @@ app.use(cookieParser())
 export { app } 
 
 // import user routes 
-import router from "./routes/user.routes.js"
+import userRouter from "./routes/user.routes.js"
 // use below route for user registeration
 app.use("/api/v1/users" , userRouter)
 

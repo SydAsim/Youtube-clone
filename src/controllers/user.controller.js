@@ -1,6 +1,8 @@
-import { ApiError } from "../utils/ApiErrors"
-import {asynchandler} from "../utils/asyncHandler"
-import {User} from '../models/user.model'
+import { ApiError } from "../utils/ApiErrors.js"
+import { ApiResponse} from "../utils/ApiResponse.js"
+import {asynchandler} from "../utils/asynchandler.js"
+import {User} from '../models/user.model.js'
+import {uploadonCloudinary} from '../utils/Cloudinary.js'
 
 
 const registerUser = asynchandler(async(req,res)=>{
@@ -38,6 +40,9 @@ const registerUser = asynchandler(async(req,res)=>{
     //Reads the uploaded files
     //Stores them in the defined folder (./public/temp)
     //Adds info to req.files, such as:
+//     console.log("req.files:", req.files);
+// console.log("req.body:", req.body);
+
     const avatarLocalPath = req.files.avatar[0]?.path
     const coverImageLocalPath = req.files.coverImage[0]?.path
 
@@ -45,8 +50,14 @@ const registerUser = asynchandler(async(req,res)=>{
         throw new ApiError(400 ,"Avatar file is required")
     }
 
+//parrellel Uplaod on Cloudinary
+//  const [avatar, coverImage] = await Promise.all([
+//   uploadonCloudinary(avatarLocalPath),
+//   uploadonCloudinary(coverImageLocalPath)
+// ]);
+
     const avatar = await uploadonCloudinary(avatarLocalPath)
-    const coverImage = await uploadonCloudinary(avatarLocalPath)
+    const coverImage = await uploadonCloudinary(coverImageLocalPath)
 
     if(!avatar){
         throw new ApiError(400 , "Avatarr upload failed . Please try again")
@@ -54,12 +65,12 @@ const registerUser = asynchandler(async(req,res)=>{
 
     // 4: create User object in mongodb
     const user = await User.create({
-        username: username.toLoawerCase(),
+        username: username.toLowerCase(),
         fullname,
         email,
         password,
         avatar:avatar.url,
-        coverImage: coverImage?.coverImage.url || ""
+        coverImage: coverImage?.url || ""
     })
 
     // 5:Confirm that is User registered or not 
@@ -77,3 +88,8 @@ const registerUser = asynchandler(async(req,res)=>{
     )
 
 })
+
+export {
+    registerUser,
+
+}
