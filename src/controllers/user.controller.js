@@ -3,6 +3,8 @@ import { ApiResponse } from "../utils/ApiResponse.js"
 import { asynchandler } from "../utils/asynchandler.js"
 import { User } from '../models/user.model.js'
 import { uploadonCloudinary } from '../utils/Cloudinary.js'
+import jwt from 'jsonwebtoken'
+import { upload } from "../middlewares/multer.middleware.js"
 
 
 const generateAccessandRefreshToken = async (userId) => {
@@ -189,7 +191,251 @@ const logoutUser = asynchandler(async (req,res)=>{
 
 
 
+const refreshAccessToken = asynchandler(async(req, res)=>{
+    const incommingRereshToken = req.body.refreshToken || req.cookies.refreshToken
+    if(!incommingRereshToken) {
+        throw new ApiError(400 , "unautorized request")
+    }
 
+    try {
+        const dedcodeToken = jwt.verify(incommingRereshToken, process.env.ACCESS_REFRESH_TOKEN)
+        
+        const user = await User.findById(dedcodeToken._id)
+
+        if(!user){
+            throw new ApiError(400 , "Invalid refreshToken")
+        }
+
+        if(incommingRereshToken !== user?.refreshToken ) {
+            throw new ApiError (400 , "RefereshToken is Expired")
+        }
+
+        const options = {
+            httpOnly : true , 
+            secure : true
+        }
+
+        const {accessToken , newrefreshToken} =generateAccessandRefreshToken(user._id)
+
+        return res 
+        .status(200)
+        .cookies("refreshToken" , newrefreshToken , options)
+        .cookies("accessToken" , accessToken , options)
+        .json(
+            new ApiResponse( 200, {accessToken , refreshToken : newrefreshToken} , "accessToken  Refreshed")
+        )
+
+    } catch (error) {
+        throw new ApiError(error?.message || "Unauthorized request")
+        
+    }
+})
+
+
+const changePassword = asynchandler(async (req, res)=>{
+    const {oldPassword , newPassword} = req.body
+    
+    const user  = await  User.findById(req?.user._id)
+    const isPasswordCorrect  = await user.isPasswordCorrect(oldPassword)
+
+    if(!isPasswordCorrect) {
+        throw new ApiError (400 , "Password incorrect")
+    }
+
+    user.password = newPassword
+    await user.save({validateBeforeSave : false})
+
+    return res
+    .status(200) 
+    .json(new ApiResponse (200 ,  {} ,"Password changed successfully"))
+})
+
+
+const getCurrentUser = asynchandler(async (req , res)=>{
+    return res
+    .status(200)
+    .json(new ApiResponse(200 , req.user , "Current user fetched Successfully"))
+})
+
+
+const updateAccountDetails = asynchandler(async(req, res)=>{
+    const {email ,fullname} = req.body
+
+    if(!email||!fullname) {
+        new ApiError (400 , "All fields are required")
+    }
+
+    const user  = await User.findByIdAndUpdate(
+        req.user?._id,
+    {
+        $set: {
+            fullname : fullname,
+            email
+        }
+    },
+    {new : true}
+).select("-password")
+
+return res
+.status(200)
+.json(new ApiResponse (200 , user  ,  "Account Updated Successfully"))
+})
+
+
+
+const updateUserAvatar = asynchandler(async(req,res)=>{
+    const avatarLocalPath = req.file?.path
+    if(!avatarLocalPath) {
+        new ApiError(400 , "Avatar file is required")
+    }
+
+    const avatar = await uploadonCloudinary(avatarLocalPath)
+    if(!avatar.url){
+        throw new ApiError(400  ,"Error while uploading avatar")
+    }
+
+    const user = await User.findByIdAndUpdate(
+
+        req.user?._id,
+
+        {
+            $set:{avatar:avatar.url}
+        },
+
+        {new : true}
+    ).select("-password")
+
+
+
+return res
+.status(200)
+.json( new ApiResponse(200, user , "Avatar or CoverImage updated Successfully" ))
+
+})
+
+
+
+
+const updateUsercoverImage = asynchandler(async(req,res)=>{
+const coverImageLocalPath = req.file?.path
+if(!coverImageLocalPath){
+throw new ApiError(400 , "CoverImage is required")
+}
+
+const coverImage = await uploadonCloudinary(coverImageLocalPath)
+if(!coverImage.url){
+    throw new ApiError(400 , "CoverImage Upload failed")
+}
+
+const user = await User.findByIdAndUpdate(
+    req.user?._id,
+    {
+        $set:{
+            coverImage : coverImage.url
+        }
+    },
+    {new : true}
+).select("-password")
+
+return res 
+.status(200)
+.json (new ApiResponse(200 , user , "CoverImage updaet Succesfully"))
+
+})
+
+
+
+
+// when you open /@syedasimbacha on the frontend.
+// So, you don’t just want their username and email —
+// you want their:
+// profile info (fullname, avatar, coverImage)
+// number of subscribers
+// number of channels they have subscribed to
+// whether the currently logged-in user is subscribed to this channel
+
+
+// “Hey MongoDB, take each user from the users collection,
+// and go to the subscriptions collection — find all documents
+// where the subscriptions.channel field matches this user’s _id.
+
+const getUserChannelProfile = asynchandler(async(req,res)=>{
+    const {username} = req.params // router.get("/users/:username", getUserChannelProfile);
+     console.log("Requested username:", req.params.username);
+
+    if(!username.trim()){
+        throw new ApiError (400 , "Username is missing")
+    } 
+
+    const channel = await  User.aggregate([
+        {
+            $match:{
+                username : username?.toLowerCase()  // User.findOne({ username: username.toLowerCase() })
+            }
+
+            
+        },
+        {
+            $lookup:{                    //---Finding who subscribed to this user  $lookup joins two collections (like SQL JOIN).
+                from : "subscriptions" , // from: "subscriptions" → we’re joining with the subscriptions collection. the collection to look inside
+                localField : "_id",      // -- our current user’s _id
+                foreignField: "channel" , // match that _id with this field inside subscriptions 
+                as : "subscribers"       //store the matching results in a new array called subscribers
+            }
+        },
+        {   // reverse of the first $lookup 
+            $lookup : {
+                from : "subscriptions",
+                localField : "_id",
+                foreignField : "subscriber",
+                as : "subscribedTo"
+            }
+        },
+        // the users  Schema now has SubscribersCount and ChannelSubscribedToCount 
+        {
+            $addFields:{
+                subscriberCount :{
+                    $size : "$subscribers"
+                },
+                subscribeTo : {
+                    $size : "$subscribedTo"
+                },
+
+                isSubscribed : { 
+                    $cond : {
+                        if : {$in : [req.user?._id , "$subscribers.subscriber"]},
+                        then : true , 
+                        else : false
+                    }
+                }
+            }
+
+        },
+        {
+            $project : {
+                fullname : 1, 
+                email : 1, 
+                username : 1, 
+                avatar : 1, 
+                coverImage : 1, 
+                subscriberCount : 1,
+                isSubscribed :1 ,
+                subscribeTo : 1
+
+            }
+        }
+
+      ])
+        if(!channel?.length){
+            throw new ApiError(400  , "Channel does not exsit")
+
+        }
+
+        return res 
+        .status(200)
+        .json (new ApiResponse(200 , channel[0] , "User channel Profile fetched successfully "))
+
+})
 
 
 
@@ -200,6 +446,16 @@ export {
     registerUser,
     loginUser,
     logoutUser,
+    refreshAccessToken,
+    changePassword,
+    getCurrentUser,
+    updateAccountDetails,
+    updateUserAvatar,
+    updateUsercoverImage,
+    getUserChannelProfile,
+
+
+
 
 
 
