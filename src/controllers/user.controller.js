@@ -5,6 +5,7 @@ import { User } from '../models/user.model.js'
 import { uploadonCloudinary } from '../utils/Cloudinary.js'
 import jwt from 'jsonwebtoken'
 import { upload } from "../middlewares/multer.middleware.js"
+import mongoose from "mongoose"
 
 
 const generateAccessandRefreshToken = async (userId) => {
@@ -198,7 +199,7 @@ const refreshAccessToken = asynchandler(async(req, res)=>{
     }
 
     try {
-        const dedcodeToken = jwt.verify(incommingRereshToken, process.env.ACCESS_REFRESH_TOKEN)
+        const dedcodeToken = jwt.verify(incommingRereshToken, process.env.REFRESH_TOKEN_SECRET)
         
         const user = await User.findById(dedcodeToken._id)
 
@@ -215,12 +216,12 @@ const refreshAccessToken = asynchandler(async(req, res)=>{
             secure : true
         }
 
-        const {accessToken , newrefreshToken} =generateAccessandRefreshToken(user._id)
+        const {accessToken , newrefreshToken} = await generateAccessandRefreshToken(user._id)
 
         return res 
         .status(200)
-        .cookies("refreshToken" , newrefreshToken , options)
-        .cookies("accessToken" , accessToken , options)
+        .cookie("refreshToken" , newrefreshToken , options)
+        .cookie("accessToken" , accessToken , options)
         .json(
             new ApiResponse( 200, {accessToken , refreshToken : newrefreshToken} , "accessToken  Refreshed")
         )
@@ -361,7 +362,7 @@ return res
 
 const getUserChannelProfile = asynchandler(async(req,res)=>{
     const {username} = req.params // router.get("/users/:username", getUserChannelProfile);
-     console.log("Requested username:", req.params.username);
+    //  console.log("Requested username:", req.params.username);
 
     if(!username.trim()){
         throw new ApiError (400 , "Username is missing")
@@ -370,7 +371,7 @@ const getUserChannelProfile = asynchandler(async(req,res)=>{
     const channel = await  User.aggregate([
         {
             $match:{
-                username : username?.toLowerCase()  // User.findOne({ username: username.toLowerCase() })
+                username : username?.toLowerCase()  // match means find compare  equlant to sql query User.findOne({ username: username.toLowerCase() })
             }
 
             
@@ -437,7 +438,62 @@ const getUserChannelProfile = asynchandler(async(req,res)=>{
 
 })
 
+const getUserWatchHistory = asynchandler (async(req ,res)=>{
+    const user  = await User.aggregate([
+        {
+            $match:{
+                _id : new mongoose.Types.ObjectId(req.user._id)
+            }
+        },
+        {
+            $lookup: {
+                from: "videos",
+                localField: "watchHistory",
+                foreignField: "_id",
+                as: "watchHistory",
+                pipeline:[
+                    {
+                        $lookup:{
+                            from: "users",
+                            localField: "owner",
+                            foreignField : "_id",
+                            as: "owner",
+                            pipeline : [
+                                {
+                                   $project : { // cause all the data of the current user will come that includes the email coverImage password etc so can add Project
+                                     username : 1,
+                                     fullname : 1,
+                                     avatar : 1
+                                     }
+                                }
+                             
 
+                            ]
+                           
+                        }
+                    }
+                    ,
+                    {
+                        //just for the ease of front we should just override the owner forntend will get owner object and from that he can owner. he can get the values
+                        $addFields : { 
+                            owner :  {
+                                $first : "$owner"
+                            }
+                        }
+                    }
+                ]
+
+
+            }
+            
+        }
+    ])
+
+
+    return res
+    .status(200)
+    .json( new ApiResponse(200 , user[0].watchHistory || [] , "User WatchedHistory Fetched Succesfully"))
+})
 
 
 
@@ -453,10 +509,6 @@ export {
     updateUserAvatar,
     updateUsercoverImage,
     getUserChannelProfile,
-
-
-
-
-
+    getUserWatchHistory,
 
 }
