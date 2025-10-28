@@ -22,7 +22,7 @@ const generateAccessandRefreshToken = async (userId) => {
 
 
     } catch (error) {
-        throw new ApiError(500, "Somthing went worng while generating access and refreshToken")
+        throw new ApiError(500 ,error?.message || "Somthing went worng while generating access and refreshToken")
 
     }
 
@@ -45,7 +45,7 @@ const registerUser = asynchandler(async (req, res) => {
     //1: Validation all field must be filled
     if ([fullname, email, username, password]
         .some(field => field?.trim() == "")) {
-        throw new ApiError("All fields are required")
+        throw new ApiError(400 ,"All fields are required")
     }
 
     //2: Check if the User Already Existed or not in DB
@@ -74,21 +74,21 @@ const registerUser = asynchandler(async (req, res) => {
         throw new ApiError(400, "Avatar file is required")
     }
 
-    //parrellel Uplaod on Cloudinary
-    //  const [avatar, coverImage] = await Promise.all([
-    //   uploadonCloudinary(avatarLocalPath),
-    //   uploadonCloudinary(coverImageLocalPath)
-    // ]);
+    // parrellel Uplaod on Cloudinary
+     const [avatar, coverImage] = await Promise.all([
+      uploadonCloudinary(avatarLocalPath),
+      uploadonCloudinary(coverImageLocalPath)
+    ]);
 
-    const avatar = await uploadonCloudinary(avatarLocalPath)
-    const coverImage = await uploadonCloudinary(coverImageLocalPath)
+    // const avatar = await uploadonCloudinary(avatarLocalPath)
+    // const coverImage = await uploadonCloudinary(coverImageLocalPath)
 
     if (!avatar) {
         throw new ApiError(400, "Avatarr upload failed . Please try again")
     }
 
     // 4: create User object in mongodb
-    const user = await User.create({
+    const createdUser = await User.create({
         username: username.toLowerCase(),
         fullname,
         email,
@@ -98,9 +98,14 @@ const registerUser = asynchandler(async (req, res) => {
     })
 
     // 5:Confirm that is User registered or not 
-    const createdUser = await User.findById(user._id).select(
-        "-password  -refreshToken"
-    )
+    // const createdUser = await User.findById(user._id).select(
+    //     "-password  -refreshToken"
+    // )
+    //ℹ️ we dont to Search for the user again and we can ignore the extra db call 
+
+    createdUser.password = undefined,          // You can safely skip the extra query and just remove fields in-memory:
+    createdUser.refreshToken = undefined
+    
 
     if (!createdUser) {
         throw new ApiError(500, "Somthing went wrong while Registering User")
@@ -179,8 +184,14 @@ const logoutUser = asynchandler(async (req,res)=>{
     )
     const options = {
         httpOnly : true , 
-        secure : true
+        secure : true                          
     }
+
+// ℹ️ℹ️ℹ️ℹ️ IN  production
+//     const options = {
+//     httpOnly: true,
+//     secure: process.env.NODE_ENV === "production"
+// }
 
     return res 
     .status(200) 
@@ -193,21 +204,21 @@ const logoutUser = asynchandler(async (req,res)=>{
 
 
 const refreshAccessToken = asynchandler(async(req, res)=>{
-    const incommingRereshToken = req.body.refreshToken || req.cookies.refreshToken
-    if(!incommingRereshToken) {
+    const incomingRefreshToken = req.body?.refreshToken || req.cookies?.refreshToken
+    if(!incomingRefreshToken) {
         throw new ApiError(400 , "unautorized request")
     }
 
     try {
-        const dedcodeToken = jwt.verify(incommingRereshToken, process.env.REFRESH_TOKEN_SECRET)
+        const dedcodeToken = jwt.verify(incomingRefreshToken, process.env.REFRESH_TOKEN_SECRET)
         
-        const user = await User.findById(dedcodeToken._id)
+        const user = await User.findById(dedcodeToken?._id)
 
         if(!user){
             throw new ApiError(400 , "Invalid refreshToken")
         }
 
-        if(incommingRereshToken !== user?.refreshToken ) {
+        if(incomingRefreshToken !== user?.refreshToken ) {
             throw new ApiError (400 , "RefereshToken is Expired")
         }
 
@@ -216,7 +227,7 @@ const refreshAccessToken = asynchandler(async(req, res)=>{
             secure : true
         }
 
-        const {accessToken , newrefreshToken} = await generateAccessandRefreshToken(user._id)
+        const {accessToken ,  refreshToken:newrefreshToken} = await generateAccessandRefreshToken(user._id)
 
         return res 
         .status(200)
@@ -227,7 +238,7 @@ const refreshAccessToken = asynchandler(async(req, res)=>{
         )
 
     } catch (error) {
-        throw new ApiError(error?.message || "Unauthorized request")
+        throw new ApiError(401 , error?.message || "Unauthorized request")
         
     }
 })

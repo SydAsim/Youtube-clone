@@ -19,10 +19,11 @@ app.use(express.urlencoded({extended:true  // urlencoded handles the username or
 app.use(express.static("public")) // static store images files etc in ur own server 
 app.use(cookieParser())
 
-export { app } 
+
 
 // import user routes 
 import userRouter from "./routes/user.routes.js"
 // use below route for user registeration
 app.use("/api/v1/users" , userRouter)
 
+export { app } 

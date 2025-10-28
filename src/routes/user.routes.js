@@ -25,7 +25,7 @@ router.route("/login").post(loginUser)
 
 router.route("/logout").post(verifyJWT , logoutUser)
 
-router.route("/access-refreshtoken").post(refreshAccessToken)
+router.route("/accessrefreshtoken").post(refreshAccessToken)
 
 router.route("/changepassword").post(verifyJWT , changePassword)
 
@@ -39,6 +39,6 @@ router.route("/updateUsercoverImage").patch(verifyJWT , upload.single("coverImag
 
 router.route("/c/:username").get(verifyJWT , getUserChannelProfile)
 
-router.route("/history").get( getUserWatchHistory)
+router.route("/history").get(verifyJWT , getUserWatchHistory)
 
 export default router
