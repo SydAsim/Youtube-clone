@@ -1,6 +1,6 @@
 import { ApiError } from "../utils/ApiErrors.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
-import { asynchandler } from "../utils/asynchandler.js"
+import { asynchandler } from "../utils/asyncHandler.js"
 import { User } from '../models/user.model.js'
 import { uploadonCloudinary } from '../utils/Cloudinary.js'
 import jwt from 'jsonwebtoken'
@@ -173,14 +173,8 @@ const loginUser = asynchandler(async (req, res) => {
 const logoutUser = asynchandler(async (req,res)=>{
     await User.findByIdAndUpdate(
         req.user._id,
-        {
-            $unset:{
-                refreshToken : 1
-            }
-        },
-        {
-             new : true
-        }
+        {$unset:{refreshToken : 1}},
+        {new : true}
     )
     const options = {
         httpOnly : true , 
