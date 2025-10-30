@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getVideoComments , deleteComment, updateComment,addComment } from "../controllers/comment.controller";
+import { getVideoComments , deleteComment, updateComment,addComment } from "../controllers/comment.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js"
 
 const router = Router()

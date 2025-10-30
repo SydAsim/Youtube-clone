@@ -24,10 +24,18 @@ app.use(cookieParser())
 // import user routes 
 import userRouter from "./routes/user.routes.js"
 import commentRouter from "./routes/comment.routes.js"
+import tweetRouter from "./routes/tweets.routes.js"
 // use below route for users related routes regestor login etc 
 app.use("/api/v1/users" , userRouter)
 
 app.use("/api/v1/comments" , commentRouter)
+
+app.use("/api/v1/tweets" , tweetRouter)
+
+// ✅ Fallback route handler (404)
+app.use((req, res, next) => {
+  res.status(404).json({ error: "Route not found" });
+});
 
 
 

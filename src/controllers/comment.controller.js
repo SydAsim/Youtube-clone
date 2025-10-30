@@ -4,6 +4,26 @@ import { ApiResponse } from "../utils/ApiResponse.js"
 import { Video } from "../models/video.model.js"
 import { Comment } from "../models/comment.model.js"
 
+// simplar version of getVideoComments
+// const getVideoComments = asyncHandler(async (req, res) => { 
+//   const { videoId } = req.params;
+
+//   // ✅ Check if video exists (optional but good practice)
+//   const video = await Video.findById(videoId);
+//   if (!video) {
+//     throw new ApiError(404, "Video not found");
+//   }
+
+//   // ✅ Get comments for this video
+//   const comments = await Comment.find({ video: videoId })
+//     .populate("user", "username avatar") // optional: populate user details
+//     .sort({ createdAt: -1 }); // optional: latest first
+
+//   return res
+//     .status(200)
+//     .json(new ApiResponse(200, comments, "Video comments fetched successfully"));
+// });
+
 const getVideoComments = asynchandler(async (req, res) => {
   const { videoId } = req.params;
   const { limit = 10, cursor } = req.query; // cursor = last comment ID from client cursor is expected to be the _id of the last comment the client saw (used for cursor-based pagination).
@@ -15,22 +35,22 @@ const getVideoComments = asynchandler(async (req, res) => {
   }
 
   // 2️ Build query Constructs a Mongo/Mongoose query object:
-  const query = { video: videoId };
-  if (cursor) {
+  const query = { video: videoId }; //It filters comments belonging to the video (video: videoId).
+  if (cursor) { //If a cursor is provided, it adds a condition to only fetch comments with an _id smaller than that cursor._id is naturally time-ordered in MongoDB, so smaller means older.
     query._id = { $lt: cursor }; // fetch comments older than last seen
   }
 
   // 3️ Fetch comments
   const comments = await Comment.find(query)
     .sort({ _id: -1 }) // newest first
-    .limit(Number(limit) + 1) // fetch one extra to detect next page
+    .limit(Number(limit) + 1) // fetch one extra to detect next page fetch one more record than needed to check if a next page exists.
     .populate("owner", "username avatar");
 
   // 4️ Handle pagination cursor
   const hasNextPage = comments.length > limit;
-  const nextCursor = hasNextPage ? comments[limit - 1]._id : null;
+  const nextCursor = hasNextPage ? comments[limit]._id : null; // The next page should start after the last real record on this page — so we set nextCursor to that comment’s _id.
 
-  if (hasNextPage) comments.pop(); // remove extra record
+  if (hasNextPage) comments.pop(); // remove extra record Removes that “extra” fetched record (the +1 item we used to check for the next page) before sending data to the client.
 
   // 5️ Send response
   return res.status(200).json(
@@ -41,6 +61,8 @@ const getVideoComments = asynchandler(async (req, res) => {
     }, "Video comments fetched successfully")
   );
 });
+
+
 
 
 
