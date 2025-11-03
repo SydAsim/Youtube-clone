@@ -19,8 +19,9 @@ if(!owner){
 }
 
 if(!title){
-    throw new ApiError(400 , "Video title and description is requiured")
+    throw new ApiError(400 , "Video title  is requiured")
 }
+
 
 
 const videoLocalFilePath = req.files?.videoFile[0]?.path
@@ -29,6 +30,8 @@ const thumbnailLocalFilePath = req.files?.thumbnail[0]?.path
 if(!videoLocalFilePath || !thumbnailLocalFilePath){
     throw new ApiError(400 , "vidoeFile and thumbnail is required")
 }
+// console.log(req.files);
+
 
 const videoUpload = await uploadonCloudinary(videoLocalFilePath)
 const thumbnailUpload = await uploadonCloudinary(thumbnailLocalFilePath)
@@ -95,6 +98,10 @@ if(thumbnailLocalFilePath){
   thumbnailurl = thumbnail.url // replace the new with old one
   }
 
+  if (!isValidObjectId(videoId)) {
+  throw new ApiError(400, "Invalid video ID");
+}
+
  
   //4 update
   const updatedVideo = await Video.findByIdAndUpdate(
@@ -159,12 +166,17 @@ const getVideoById = asynchandler(async(req,res)=>{
 
 const togglePublishStatus = asynchandler(async(req , res)=>{
     const {videoId} = req.params
-
+    
     const video = await Video.findById(videoId)
+
+    if (video.owner.toString() !== req.user._id.toString()) {
+  throw new ApiError(403, "You are not authorized to change publish status");
+}
 
     if(!video){
         throw new ApiError(400 , "video deos not Exists")
     }
+
    
     // if(video.isPublished === true){
     //     video.isPublished = false
@@ -201,7 +213,7 @@ const getAllVideos = asynchandler(async (req, res) => {
 
   // If no videos found
   if (publishedVideos.length === 0) {
-    throw new ApiError(404, "No published videos found for this user");
+    return res.status(200).json(new ApiResponse(200 , [] ,"No published videos found for this user"))
   }
 
   // Send response
