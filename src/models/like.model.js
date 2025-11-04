@@ -2,7 +2,7 @@ import mongoose, {Schema, Types} from "mongoose";
 
 const likeSchema = new Schema (
     {
-        comments:{
+        comment:{
             type : Schema.Types.ObjectId,
             ref : "Comment"
         },
@@ -23,3 +23,9 @@ const likeSchema = new Schema (
 
     },{timestamps : true}
 )
+
+
+// ✅ Prevent duplicate likes by the same user on same video
+likeSchema.index({ video: 1, user: 1 }, { unique: true });
+
+export const Like = mongoose.model("Like" , likeSchema)
