@@ -24,8 +24,9 @@ if(!title){
 
 
 
-const videoLocalFilePath = req.files?.videoFile[0]?.path
-const thumbnailLocalFilePath = req.files?.thumbnail[0]?.path
+const videoLocalFilePath = req.files?.videoFile?.[0]?.path;
+const thumbnailLocalFilePath = req.files?.thumbnail?.[0]?.path;
+
 
 if(!videoLocalFilePath || !thumbnailLocalFilePath){
     throw new ApiError(400 , "vidoeFile and thumbnail is required")
