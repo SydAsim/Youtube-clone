@@ -32,7 +32,7 @@ const toggleVideoLike = asynchandler(async(req,res)=>{
 
     if(existingLike){
         // unlike remove it 
-        await existingLike.deleteOne()
+        await existingLike.deleteOne()  // deletes that exact doc or model level Like.deleteOne({video :videoId , likedby : userId})
         return res.status(200).json(new ApiResponse(200 , {},"unliked Video  successfully"))
     }
     

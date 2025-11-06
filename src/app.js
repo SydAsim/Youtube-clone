@@ -42,7 +42,7 @@ app.use("/api/v1/playlist" ,playlistRouter)
 
 app.use("/api/v1/likes" ,likeRouter)
 
-app.use("api/v1/subscriptions" , subscriptionRouter)
+app.use("/api/v1/subscriptions" , subscriptionRouter)
 
 
 

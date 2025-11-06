@@ -12,10 +12,16 @@ const router = Router()
 
 router.use(verifyJWT)
 
+// 1️ Toggle subscription to a channel (subscribe/unsubscribe)
 router.route("/c/:channelId")
-       .get(getSubscribedChannels)
-       .post(toggleSubscription)
+    .post(toggleSubscription)
 
-router.route("/u/:subscriberId").get(getUserChannelSubscribers)       
+// 2️ Get all channels a user has subscribed to
+router.route("/subscribed/:subscriberId")
+    .get(getSubscribedChannels)
+
+// 3️ Get all subscribers of a particular channel
+router.route("/u/:channelId")
+    .get(getUserChannelSubscribers)
 
 export default router
