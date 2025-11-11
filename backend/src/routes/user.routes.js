@@ -37,7 +37,7 @@ router.route("/updateUserAvatar").patch(verifyJWT , upload.single("avatar") , up
 
 router.route("/updateUsercoverImage").patch(verifyJWT , upload.single("coverImage") , updateUsercoverImage)
 
-router.route("/c/:username").get(verifyJWT , getUserChannelProfile)
+router.route("/c/:username").get(getUserChannelProfile) // Public route - anyone can view channels
 
 router.route("/history").get(verifyJWT , getUserWatchHistory)
 

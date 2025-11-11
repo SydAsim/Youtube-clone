@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { Video } from "../models/video.model.js";
 import { Like } from "../models/like.model.js";
 import { Subscription } from "../models/subscription.model.js";
-import { asynchandler } from "../utils/asynchandler.js";
+import { asynchandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiErrors.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 
@@ -71,7 +71,7 @@ const getChannelVideos = asynchandler(async (req, res) => {
 
   const videos = await Video.find({ owner: channelId })
     .sort({ createdAt: -1 }) // newest first
-    .select("title thumbnail views likes createdAt videoFile");
+    .select("title thumbnail views likes createdAt videoFile duration");
 
   return res
     .status(200)
@@ -85,9 +85,9 @@ const getChannelVideos = asynchandler(async (req, res) => {
 // All videos from all users sorted by views (Top to Low)
 const getHomeFeed = asynchandler(async (req, res) => {
   const videos = await Video.find({})
-    .populate("owner", "username avatar") // Referenced Models
+    .populate("owner", "username avatar fullname") // Referenced Models
     .sort({ views: -1 }) // top to low
-    .select("title thumbnail views createdAt owner videoFile"); // Current Model
+    .select("title thumbnail views createdAt owner videoFile duration"); // Current Model - added duration
 
   return res
     .status(200)

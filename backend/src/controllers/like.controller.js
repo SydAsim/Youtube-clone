@@ -142,7 +142,13 @@ const getLikedVideos = asynchandler(async(req,res)=>{
     likedby : userId,
     video : {$ne : null}          //Only include documents where video is not equal to null
     })
-    .populate("video")           //This is a Mongoose method that automatically replaces the video field (which currently stores just an ObjectId like "6908fa52a0396729218eab86")
+    .populate({
+      path: 'video',
+      populate: {
+        path: 'owner',
+        select: 'username fullname avatar'
+      }
+    })           //Populate video and its owner information
     .select("-__v   -likedby")  //-__v → removes the version key that Mongoose adds automatically. -likedby → hides the likedby field (you already know who liked them — the current user)
     // so query means Find all Like documents where the likedby user is the current user and the video field is not null. Then, replace the video ID with the full video document and remove extra fields//
 

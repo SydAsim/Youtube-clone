@@ -1,6 +1,7 @@
 import mongoose ,{ isValidObjectId } from "mongoose"
 import {Video} from "../models/video.model.js"
 import {User} from "../models/user.model.js"
+import {View} from "../models/view.model.js"
 import {asynchandler} from "../utils/asyncHandler.js"
 import {ApiError} from "../utils/ApiErrors.js"
 import {ApiResponse} from "../utils/ApiResponse.js"
@@ -41,13 +42,21 @@ if(!videoUpload || !thumbnailUpload){
     throw new ApiError(400 , "video upload failed to Cloudinary ")
 }
 
+// Extract duration from Cloudinary response
+// Cloudinary returns duration in seconds for video files
+const videoDuration = videoUpload.duration || 0;
+console.log('Cloudinary video upload response:', {
+    duration: videoDuration,
+    format: videoUpload.format,
+    resource_type: videoUpload.resource_type
+});
 
 const publishedVideo  = await Video.create({
     videoFile : videoUpload.url,
     thumbnail : thumbnailUpload.url,
     title,
     description,
-    duration : videoUpload.duration || 0,
+    duration : Math.round(videoDuration), // Round to nearest second
     isPublished : true,
     owner
 })
@@ -152,16 +161,70 @@ const deleteVideo = asynchandler(async(req, res)=>{
 
 const getVideoById = asynchandler(async(req,res)=>{
    const {videoId} = req.params
+   const userId = req.user?._id // May be undefined if not logged in
+   const ipAddress = req.ip || req.connection.remoteAddress
 
-   const video = await Video.findById(videoId)
+   // Populate owner information for video display
+   const video = await Video.findById(videoId).populate('owner', 'username fullname avatar')
+   
    if(!video){
-    throw new ApiError(400 , "video does not Exsit")
+    throw new ApiError(400 , "video does not Exist")
    }
 
+   // Increment view count logic
+   let shouldIncrementView = true
+
+   // 1. Don't count if user is viewing their own video
+   if(userId && video.owner._id.toString() === userId.toString()) {
+     shouldIncrementView = false
+   }
+
+   // 2. Check if this user/IP has already viewed this video
+   if(shouldIncrementView) {
+     try {
+       // Try to create a view record
+       if(userId) {
+         // For logged-in users
+         try {
+           await View.create({ video: videoId, viewer: userId })
+           
+           // Only add to watch history if view was successfully created
+           await User.findByIdAndUpdate(
+             userId,
+             {
+               $addToSet: { watchHistory: videoId } // $addToSet prevents duplicates
+             }
+           ).catch(err => console.error('Watch history update failed:', err))
+           
+           // Increment view count only on first view
+           video.views = (video.views || 0) + 1
+           await video.save()
+         } catch (viewError) {
+           // If duplicate view (already viewed), don't increment or add to history
+           if(viewError.code !== 11000) {
+             console.error('Error creating view record:', viewError)
+           }
+         }
+       } else {
+         // For anonymous users (by IP)
+         try {
+           await View.create({ video: videoId, ipAddress })
+           video.views = (video.views || 0) + 1
+           await video.save()
+         } catch (viewError) {
+           if(viewError.code !== 11000) {
+             console.error('Error creating view record:', viewError)
+           }
+         }
+       }
+     } catch (error) {
+       console.error('Error in view tracking:', error)
+     }
+   }
 
    return res
    .status(200) 
-   .json(new ApiResponse(200 , video , "Video fetech by id Successfully"))
+   .json(new ApiResponse(200 , video , "Video fetched by id Successfully"))
 })
 
 
@@ -199,30 +262,88 @@ const togglePublishStatus = asynchandler(async(req , res)=>{
 
 
 const getAllVideos = asynchandler(async (req, res) => {
-  const owner = req.user?._id;
+  try {
+    // Fetch all published videos with owner information
+    // No authentication required - anyone can view published videos
+    const publishedVideos = await Video.find({
+      isPublished: true,
+    })
+    .populate('owner', 'username fullname avatar')
+    .sort({ createdAt: -1 }); // Most recent first
 
-  // Check if owner exists
-  if (!owner) {
-    throw new ApiError(400, "Owner does not exist");
+    // If no videos found
+    if (!publishedVideos || publishedVideos.length === 0) {
+      return res.status(200).json(new ApiResponse(200, [], "No published videos found"))
+    }
+
+    // Send response
+    return res.status(200).json(new ApiResponse(200, publishedVideos, "Videos fetched successfully"));
+  } catch (error) {
+    console.error('Error fetching all videos:', error);
+    throw new ApiError(500, "Failed to fetch videos");
   }
+});
 
-  // Fetch only published videos of this specific owner
-  const publishedVideos = await Video.find({
-    owner,
-    isPublished: true,
-  });
 
-  // If no videos found
-  if (publishedVideos.length === 0) {
-    return res.status(200).json(new ApiResponse(200 , [] ,"No published videos found for this user"))
+const searchVideos = asynchandler(async (req, res) => {
+  try {
+    const { query, page = 1, limit = 20 } = req.query;
+
+    console.log('=== SEARCH REQUEST ===');
+    console.log('Query:', query);
+    console.log('Page:', page);
+    console.log('Limit:', limit);
+
+    if (!query || query.trim() === '') {
+      console.log('Empty query received');
+      return res.status(400).json(
+        new ApiResponse(400, null, "Search query is required")
+      );
+    }
+
+    // Simple regex search
+    const searchQuery = {
+      isPublished: true,
+      $or: [
+        { title: { $regex: query, $options: 'i' } },
+        { description: { $regex: query, $options: 'i' } }
+      ]
+    };
+
+    console.log('Search query:', JSON.stringify(searchQuery));
+
+    // Execute search
+    const videos = await Video.find(searchQuery)
+      .populate('owner', 'username fullname avatar')
+      .select('title thumbnail views createdAt owner videoFile duration')
+      .sort({ createdAt: -1 })
+      .limit(parseInt(limit))
+      .skip((parseInt(page) - 1) * parseInt(limit));
+
+    const totalResults = await Video.countDocuments(searchQuery);
+
+    console.log(`Found ${totalResults} results, returning ${videos.length} videos`);
+
+    return res.status(200).json(
+      new ApiResponse(200, {
+        videos,
+        pagination: {
+          currentPage: parseInt(page),
+          totalPages: Math.ceil(totalResults / parseInt(limit)),
+          totalResults,
+          limit: parseInt(limit)
+        }
+      }, "Search results fetched successfully")
+    );
+  } catch (error) {
+    console.error('=== SEARCH ERROR ===');
+    console.error('Error message:', error.message);
+    console.error('Error stack:', error.stack);
+    
+    return res.status(500).json(
+      new ApiResponse(500, null, error.message || "Failed to search videos")
+    );
   }
-
-  // Send response
-  return res.status(200).json({
-    success: true,
-    count: publishedVideos.length,
-    data: publishedVideos,
-  });
 });
 
 
@@ -235,7 +356,8 @@ export{
     deleteVideo,
     togglePublishStatus,
     getVideoById,
-    getAllVideos
+    getAllVideos,
+    searchVideos
 }
 
 // without spread operator in update  we can also write it like that

@@ -162,7 +162,16 @@ const removeVideofromPlaylist = asynchandler(async(req ,res)=>{
 const getPlaylistbyId = asynchandler(async(req, res)=>{
     const {playlistId} = req.params
     
+    // Populate videos with full details and owner information
     const isplaylistexist = await PlayList.findById(playlistId)
+        .populate({
+            path: 'videos',
+            populate: {
+                path: 'owner',
+                select: 'username fullname avatar'
+            }
+        })
+        .populate('owner', 'username fullname avatar')
 
     if(!isplaylistexist){
         throw new ApiError(400 , "playlist does not Exist")

@@ -65,10 +65,8 @@ const registerUser = asynchandler(async (req, res) => {
     //     console.log("req.files:", req.files);
     // console.log("req.body:", req.body);
 
-    const avatarLocalPath = req.files?.avatar[0]?.path
-    const coverImageLocalPath = req.files?.coverImage[0]?.path
-    // const avatarLocalPath = req.files?.avatar?.[0]?.path
-    // const coverImageLocalPath = req.files?.coverImage?.[0]?.path
+    const avatarLocalPath = req.files?.avatar?.[0]?.path
+    const coverImageLocalPath = req.files?.coverImage?.[0]?.path
 
     if (!avatarLocalPath) {
         throw new ApiError(400, "Avatar file is required")
@@ -113,7 +111,7 @@ const registerUser = asynchandler(async (req, res) => {
 
     // 6:return response 
     return res.status(201).json(
-        new ApiResponse(createdUser, "User regsitered Successfully")
+        new ApiResponse(201, createdUser, "User registered Successfully")
     )
 
 })
@@ -190,7 +188,7 @@ const logoutUser = asynchandler(async (req,res)=>{
     return res 
     .status(200) 
     .clearCookie("refreshToken", options )
-    .clearCookie("acessToken", options )
+    .clearCookie("accessToken", options )
     .json(new ApiResponse (200 , {} , "User logged out successfully"))
 })
 
@@ -409,7 +407,12 @@ const getUserChannelProfile = asynchandler(async(req,res)=>{
 
                 isSubscribed : { 
                     $cond : {
-                        if : {$in : [req.user?._id , "$subscribers.subscriber"]},
+                        if : {
+                            $and: [
+                                { $ne: [req.user?._id, null] }, // Check if user is logged in
+                                { $in: [req.user?._id, "$subscribers.subscriber"] }
+                            ]
+                        },
                         then : true , 
                         else : false
                     }

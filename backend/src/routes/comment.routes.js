@@ -4,13 +4,13 @@ import { verifyJWT } from "../middlewares/auth.middleware.js"
 
 const router = Router()
 
-router.use(verifyJWT) // we are declaring all the routes
-// must be using verfiyJWT middleware to verify
+// Public route - anyone can view comments
+router.route("/:videoId").get(getVideoComments)
 
-
-//it means For the same endpoint /api/comments/:videoId, 
-// if the request method is GET, run getVideoComments, if it’s POST, run addComment.
-router.route("/:videoId").get(getVideoComments).post(addComment)
-router.route("/c/:commentId").patch(updateComment).delete(deleteComment)
+// Protected routes - must be logged in
+router.route("/:videoId").post(verifyJWT, addComment)  // Must be logged in to add comment
+router.route("/c/:commentId")
+    .patch(verifyJWT, updateComment)  // Must be logged in to update
+    .delete(verifyJWT, deleteComment)  // Must be logged in to delete
 
 export default router
