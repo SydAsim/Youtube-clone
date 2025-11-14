@@ -1,25 +1,31 @@
 // require('dotenv').config({path : './env'})  //As early as possible in your application, 
 // import and configure dotenv but in breaks code consistancy so 
-import dotenv from "dotenv"
-import connetDB from "./db/index.js";
-import {app} from "./app.js"
+import dotenv from "dotenv";
+import connectDB from "./src/db/index.js";
+import { app } from "./src/app.js";
 
-dotenv.config({
-    path:'./.env'
-})  //also confing package.json
+// Load environment variables early
+dotenv.config({ path: './.env' });
 
-connetDB()
-.then(()=>{
-     app.listen(process.env.PORT || 8000 , ()=> {
-        console.log(`Server is Running at ${process.env.PORT}`);
-        
-     }) 
-}
-)
-.catch( (err)=>{
-    console.log("Db connection failed" ,err);
-}
-)
+// Connect to MongoDB and then start the server
+connectDB()
+  .then(() => {
+    const PORT = process.env.PORT || 3000;
+    const HOST = '0.0.0.0'; // <- important for Fly
+
+    const server = app.listen(PORT, HOST, () => {
+      console.log(`Server is running at http://${HOST}:${PORT}`);
+    });
+
+    server.on('error', (err) => {
+      console.error('Server failed to start:', err);
+      process.exit(1);
+    });
+  })
+  .catch((err) => {
+    console.error("DB connection failed:", err);
+    process.exit(1); // Exit process if DB fails
+  });
 
 
 
