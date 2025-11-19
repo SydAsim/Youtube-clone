@@ -48,12 +48,12 @@ const Sidebar = () => {
   const NavLink = ({ to, icon: Icon, children }) => (
     <Link
       to={to}
-      className={`flex items-center gap-4 px-6 py-3 hover:bg-gray-700 transition ${
-        isActive(to) ? 'bg-gray-700' : ''
+      className={`flex items-center gap-4 px-3 py-2.5 mx-3 rounded-lg hover:bg-yt-lighter transition text-sm ${
+        isActive(to) ? 'bg-yt-lighter font-medium' : ''
       }`}
     >
-      <Icon className="w-6 h-6" />
-      <span>{children}</span>
+      <Icon className="w-5 h-5 flex-shrink-0" />
+      <span className="truncate">{children}</span>
     </Link>
   );
 
@@ -70,41 +70,41 @@ const Sidebar = () => {
       {/* Sidebar */}
       <aside 
         className={`
-          fixed left-0 top-16 bottom-0 w-64 bg-secondary overflow-y-auto z-40
+          fixed left-0 top-14 bottom-0 w-64 bg-yt-black overflow-y-auto z-40
           transition-transform duration-300 ease-in-out
           sidebar-scrollbar
           ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
         `}
       >
-        <div className="py-4">
+        <div className="py-3">
           {/* Main navigation */}
-          <div className="mb-4">
+          <div className="mb-2">
             <NavLink to="/" icon={Home}>Home</NavLink>
             <NavLink to="/trending" icon={TrendingUp}>Trending</NavLink>
             <NavLink to="/subscriptions" icon={Users}>Subscriptions</NavLink>
           </div>
 
-          <hr className="border-gray-700" />
+          <hr className="border-yt-lighter my-2" />
 
-          {/* User-specific links - only show when authenticated */}
+          {/* User-specific links */}
           {isAuthenticated && (
             <>
-              <div className="py-4">
-                <NavLink to="/history" icon={History}>Watch History</NavLink>
-                <NavLink to="/liked-videos" icon={ThumbsUp}>Liked Videos</NavLink>
+              <div className="py-2">
+                <NavLink to="/history" icon={History}>History</NavLink>
+                <NavLink to="/liked-videos" icon={ThumbsUp}>Liked videos</NavLink>
                 <NavLink to="/playlists" icon={List}>Playlists</NavLink>
-                <NavLink to="/my-videos" icon={Video}>Your Videos</NavLink>
+                <NavLink to="/my-videos" icon={Video}>Your videos</NavLink>
                 <NavLink to="/tweets" icon={MessageSquare}>Tweets</NavLink>
               </div>
 
-              <hr className="border-gray-700" />
+              <hr className="border-yt-lighter my-2" />
             </>
           )}
 
-          {/* Footer info */}
-          <div className="px-6 py-4 text-sm text-gray-400">
-            <p>YouTube Clone Project</p>
-            <p className="mt-2">© 2024 Built with React.js</p>
+          {/* Footer */}
+          <div className="px-3 sm:px-6 py-4 text-xs text-yt-text-secondary">
+            <p className="truncate">YouTube Clone</p>
+            <p className="mt-1 truncate">© 2024 Built with React</p>
           </div>
         </div>
       </aside>

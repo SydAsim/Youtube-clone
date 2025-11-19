@@ -1,5 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-  <rect width="24" height="24" fill="#FF0000" rx="4"/>
-  <path d="M21.582 7.186c-.252-1.028-1.002-1.834-2.003-2.094C18.254 4.75 12 4.75 12 4.75s-6.254 0-7.579.342c-1.001.26-1.751 1.066-2.003 2.094C2 8.57 2 12 2 12s0 3.43.418 4.814c.252 1.028 1.002 1.834 2.003 2.094C5.746 19.25 12 19.25 12 19.25s6.254 0 7.579-.342c1.001-.26 1.751-1.066 2.003-2.094C22 15.43 22 12 22 12s0-3.43-.418-4.814z" fill="#FF0000"/>
-  <path d="M10 15.5v-7l6 3.5-6 3.5z" fill="#FFFFFF"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 90">
+  <!-- Red rounded rectangle (YouTube style) -->
+  <rect x="10" y="20" width="70" height="50" rx="12" fill="#FF0000"/>
+  
+  <!-- White play button triangle -->
+  <path d="M 37 35 L 37 55 L 55 45 Z" fill="#FFFFFF"/>
 </svg>

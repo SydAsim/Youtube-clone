@@ -90,11 +90,11 @@ const Navbar = () => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search"
-            className="flex-1 bg-yt-black border border-yt-lighter rounded-l-full px-4 py-2 text-sm focus:outline-none focus:border-yt-blue placeholder-yt-text-secondary"
+            className="flex-1 bg-[#121212] border border-[#303030] rounded-l-full px-4 py-2 text-sm focus:outline-none focus:border-yt-blue placeholder-yt-text-secondary"
           />
           <button
             type="submit"
-            className="bg-yt-lighter border border-yt-lighter rounded-r-full px-4 sm:px-6 py-2 hover:bg-yt-light"
+            className="bg-[#222222] border border-[#303030] border-l-0 rounded-r-full px-4 sm:px-6 py-2 hover:bg-[#2a2a2a]"
           >
             <Search className="w-5 h-5" />
           </button>
@@ -129,11 +129,11 @@ const Navbar = () => {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search"
                   autoFocus
-                  className="flex-1 bg-yt-black border border-yt-lighter rounded-l-full px-4 py-2 text-sm focus:outline-none focus:border-yt-blue placeholder-yt-text-secondary"
+                  className="flex-1 bg-[#121212] border border-[#303030] rounded-l-full px-4 py-2 text-sm focus:outline-none focus:border-yt-blue placeholder-yt-text-secondary"
                 />
                 <button
                   type="submit"
-                  className="bg-yt-lighter border border-yt-lighter rounded-r-full px-4 py-2 hover:bg-yt-light"
+                  className="bg-[#222222] border border-[#303030] border-l-0 rounded-r-full px-4 py-2 hover:bg-[#2a2a2a]"
                 >
                   <Search className="w-5 h-5" />
                 </button>
@@ -171,7 +171,7 @@ const Navbar = () => {
 
               {/* Dropdown menu */}
               {showUserMenu && (
-                <div className="absolute right-0 mt-2 w-56 sm:w-64 bg-yt-dark rounded-xl shadow-2xl py-2 border border-yt-lighter">
+                <div className="absolute right-0 mt-2 w-56 sm:w-64 bg-[#282828] rounded-xl shadow-2xl py-2 border border-[#3f3f3f]">
                   <Link
                     to={`/channel/${user?.username}`}
                     className="flex items-center gap-3 px-4 py-2 hover:bg-gray-700"

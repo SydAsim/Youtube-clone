@@ -20,15 +20,15 @@ const Layout = ({ children }) => {
   const { isSidebarOpen } = useSidebar();
   
   return (
-    <div className="min-h-screen bg-dark">
+    <div className="min-h-screen bg-yt-black">
       {/* Fixed navbar at top */}
       <Navbar />
       
-      <div className="flex pt-16"> {/* pt-16 to account for fixed navbar */}
+      <div className="flex pt-14"> {/* pt-14 to account for fixed navbar (56px) */}
         {/* Sidebar */}
         <Sidebar />
         
-        {/* Main content area - adjust margin based on sidebar state */}
+        {/* Main content area */}
         <main className={`flex-1 transition-all duration-300 ${isSidebarOpen ? 'ml-64' : 'ml-0'}`}>
           {children}
         </main>
