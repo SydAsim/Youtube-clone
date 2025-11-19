@@ -39,6 +39,24 @@ body {
   background: #909090;
 }
 
+/* Thin scrollbar for sidebar */
+.sidebar-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-scrollbar::-webkit-scrollbar-thumb {
+  background: #3f3f3f;
+  border-radius: 10px;
+}
+
+.sidebar-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #717171;
+}
+
 /* YouTube-style focus outline */
 *:focus-visible {
   outline: 2px solid #3ea6ff;

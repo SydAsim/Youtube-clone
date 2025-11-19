@@ -72,6 +72,7 @@ const Sidebar = () => {
         className={`
           fixed left-0 top-16 bottom-0 w-64 bg-secondary overflow-y-auto z-40
           transition-transform duration-300 ease-in-out
+          sidebar-scrollbar
           ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
         `}
       >
