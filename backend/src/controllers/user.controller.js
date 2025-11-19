@@ -150,14 +150,20 @@ const loginUser = asynchandler(async (req, res) => {
     const options = {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-        maxAge: 24 * 60 * 60 * 1000 // 1 day
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // 'none' for cross-domain in production
+        maxAge: 24 * 60 * 60 * 1000, // 1 day
+        path: '/' // Ensure cookie is available on all paths
+    }
+
+    const refreshOptions = {
+        ...options,
+        maxAge: 10 * 24 * 60 * 60 * 1000 // 10 days
     }
 
     return res
         .status(200)
         .cookie("accessToken", accessToken, options)
-        .cookie("refreshToken", refreshToken, { ...options, maxAge: 10 * 24 * 60 * 60 * 1000 })
+        .cookie("refreshToken", refreshToken, refreshOptions)
         .json(
             new ApiResponse(
                 200,
@@ -180,7 +186,8 @@ const logoutUser = asynchandler(async (req, res) => {
     const options = {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict'
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        path: '/'
     }
 
     // ℹ️ℹ️ℹ️ℹ️ IN  production
@@ -221,7 +228,8 @@ const refreshAccessToken = asynchandler(async (req, res) => {
         const options = {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict'
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+            path: '/'
         }
 
         const { accessToken, refreshToken: newrefreshToken } = await generateAccessandRefreshToken(user._id)
