@@ -40,6 +40,8 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import Search from './pages/Search';
 import Watch from './pages/Watch';
 import Channel from './pages/Channel';
@@ -60,11 +62,18 @@ function App() {
       {/* SidebarProvider manages sidebar open/close state */}
       <SidebarProvider>
         {/* BrowserRouter enables client-side routing */}
-        <BrowserRouter>
+        <BrowserRouter
+          future={{
+            v7_startTransition: true,
+            v7_relativeSplatPath: true
+          }}
+        >
           <Routes>
           {/* Public routes - No authentication required */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
 
           {/* Routes with Layout (Navbar + Sidebar) */}
           <Route path="/" element={<Layout><Home /></Layout>} />

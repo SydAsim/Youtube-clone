@@ -23,12 +23,12 @@ const formatViews = (views) => {
   if (!views && views !== 0) {
     return '0';
   }
-  
+
   const viewCount = Number(views);
   if (isNaN(viewCount)) {
     return '0';
   }
-  
+
   if (viewCount >= 1000000) {
     return (viewCount / 1000000).toFixed(1) + 'M';
   }
@@ -47,7 +47,7 @@ const formatDate = (dateString) => {
   const now = new Date();
   const diffTime = Math.abs(now - date);
   const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-  
+
   if (diffDays === 0) return 'Today';
   if (diffDays === 1) return 'Yesterday';
   if (diffDays < 7) return `${diffDays} days ago`;
@@ -65,11 +65,11 @@ const formatDuration = (seconds) => {
   if (!seconds || isNaN(seconds) || seconds <= 0) {
     return '0:00';
   }
-  
+
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
   const secs = Math.floor(seconds % 60);
-  
+
   if (hours > 0) {
     return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   }
@@ -93,11 +93,10 @@ const VideoCard = ({ video, layout = 'grid' }) => {
         <img
           src={video.thumbnail}
           alt={video.title}
-          className={`${
-            isListLayout ? 'w-64 h-36' : 'w-full aspect-video'
-          } object-cover rounded-lg`}
+          className={`${isListLayout ? 'w-64 h-36' : 'w-full aspect-video'
+            } object-cover rounded-lg`}
         />
-        
+
         {/* Duration badge - positioned absolutely over thumbnail */}
         <span className="absolute bottom-2 right-2 bg-black bg-opacity-80 text-white text-xs px-2 py-1 rounded">
           {formatDuration(video.duration)}
@@ -107,31 +106,30 @@ const VideoCard = ({ video, layout = 'grid' }) => {
       {/* Video info */}
       <div className={`flex gap-3 ${isListLayout ? 'flex-1' : 'mt-3'}`}>
         {/* Channel avatar */}
-        <Link to={`/channel/${video.owner?.username}`}>
+        <Link to={`/channel/${video.owner?.username}`} className="flex-shrink-0">
           <img
             src={video.owner?.avatar}
             alt={video.owner?.username}
-            className="w-9 h-9 rounded-full object-cover"
+            className="w-10 h-10 rounded-full object-cover"
           />
         </Link>
 
         {/* Title and metadata */}
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <Link to={`/watch/${video._id}`}>
-            <h3 className={`${
-              isListLayout ? 'text-lg' : 'text-sm'
-            } font-medium line-clamp-2 group-hover:text-blue-400`}>
+            <h3 className={`${isListLayout ? 'text-lg' : 'text-base'
+              } font-medium line-clamp-2 text-yt-text leading-snug mb-2`}>
               {video.title}
             </h3>
           </Link>
 
           <Link to={`/channel/${video.owner?.username}`}>
-            <p className="text-sm text-gray-400 hover:text-white mt-1">
+            <p className="text-sm text-yt-text-secondary hover:text-yt-text">
               {video.owner?.fullname}
             </p>
           </Link>
 
-          <div className="text-sm text-gray-400 mt-1">
+          <div className="text-sm text-yt-text-secondary mt-1">
             <span>{formatViews(video.views)} views</span>
             <span className="mx-1">•</span>
             <span>{formatDate(video.createdAt)}</span>

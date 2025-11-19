@@ -50,3 +50,12 @@ export const deleteTweet = async (tweetId) => {
   const response = await api.delete(`/tweets/${tweetId}`);
   return response.data;
 };
+
+/**
+ * Get all tweets (Global Feed)
+ * @returns {Promise} List of tweets
+ */
+export const getAllTweets = async () => {
+  const response = await api.get('/tweets');
+  return response.data;
+};

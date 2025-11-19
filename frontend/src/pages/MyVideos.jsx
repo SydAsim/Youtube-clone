@@ -34,9 +34,9 @@ const MyVideos = () => {
 
   const handleTogglePublish = async (videoId, currentStatus) => {
     try {
-      await togglePublishStatus(videoId);
-      setVideos(videos.map(v => 
-        v._id === videoId ? { ...v, isPublished: !currentStatus } : v
+      const response = await togglePublishStatus(videoId);
+      setVideos(videos.map(v =>
+        v._id === videoId ? { ...v, isPublished: response.data } : v
       ));
     } catch (error) {
       console.error('Failed to toggle publish status:', error);
@@ -98,7 +98,7 @@ const MyVideos = () => {
                     {video.title}
                   </h3>
                 </Link>
-                
+
                 <p className="text-sm text-gray-400 mt-1 line-clamp-2">
                   {video.description}
                 </p>
@@ -117,7 +117,10 @@ const MyVideos = () => {
                 <div className="flex items-center gap-3 mt-4">
                   <button
                     onClick={() => handleTogglePublish(video._id, video.isPublished)}
-                    className="flex items-center gap-2 px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded text-sm"
+                    className={`flex items-center gap-2 px-3 py-1 rounded text-sm ${video.isPublished
+                      ? 'bg-yellow-600 hover:bg-yellow-700'
+                      : 'bg-green-600 hover:bg-green-700'
+                      }`}
                   >
                     {video.isPublished ? (
                       <>

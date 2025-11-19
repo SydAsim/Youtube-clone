@@ -6,9 +6,19 @@ import cors from "cors"
 const app = express()
 
 app.use(cors({
-    origin: process.env.CORS_ORIGIN,
-    credentials:true 
-    
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+        
+        const allowedOrigins = process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : [];
+        
+        if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true
 }))
 // we can also specify that on which to allow from the front end vite etc
 

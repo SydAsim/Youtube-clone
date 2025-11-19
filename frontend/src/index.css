@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Roboto", "Arial", sans-serif;
   line-height: 1.5;
   font-weight: 400;
 }
@@ -15,26 +15,37 @@
 }
 
 body {
-  background-color: #0F0F0F;
-  color: white;
+  background-color: #0f0f0f;
+  color: #f1f1f1;
   min-height: 100vh;
 }
 
-/* Custom scrollbar */
+/* Custom scrollbar - YouTube style */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0F0F0F;
+  background: #0f0f0f;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #3f3f3f;
-  border-radius: 4px;
+  background: #717171;
+  border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background: #909090;
+}
+
+/* YouTube-style focus outline */
+*:focus-visible {
+  outline: 2px solid #3ea6ff;
+  outline-offset: 2px;
+}
+
+/* Smooth transitions */
+a, button {
+  transition: all 0.2s ease;
 }

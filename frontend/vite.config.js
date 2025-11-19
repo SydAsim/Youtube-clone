@@ -7,12 +7,14 @@ export default defineConfig({
     port: 5173,
     proxy:{ 
       // Proxy configuration to avoid CORS issues
-      // All requests starting with /api will be forwarded to the backend server
-      '/api': {
-        target: 'http://localhost:8000',  // Backend server URL
-        changeOrigin: true,  // Changes the origin of the host header to the target URL
-        secure: false,  // If backend uses HTTPS with self-signed certificate
-      }
+      // Comment out for development with Fly.io- backend
+      // Uncomment if running local backend on port 8000
+      
+      // '/api': {
+      //   target: 'http://localhost:8000',  // Backend server URL
+      //   changeOrigin: true,  // Changes the origin of the host header to the target URL
+      //   secure: false,  // If backend uses HTTPS with self-signed certificate
+      // }
     }
   },
   plugins: [react()],

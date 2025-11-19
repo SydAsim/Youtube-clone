@@ -11,7 +11,7 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon  -r dotenv/config --experimental-json-modules  src/index.js",
+    "dev": "nodemon -r dotenv/config --experimental-json-modules index.js",
     "start": "node index.js",
     "start:src": "node src/index.js"
   },
@@ -30,6 +30,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.19.1",
     "mongoose-aggregate-paginate-v2": "^1.1.4",
-    "multer": "^2.0.2"
+    "multer": "^2.0.2",
+    "nodemailer": "^7.0.10"
   }
 }

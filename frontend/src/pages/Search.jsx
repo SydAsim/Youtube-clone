@@ -19,7 +19,7 @@ import { Search as SearchIcon } from 'lucide-react';
 const Search = () => {
   const [searchParams] = useSearchParams();
   const query = searchParams.get('q');
-  
+
   const [videos, setVideos] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
@@ -44,11 +44,9 @@ const Search = () => {
     try {
       setIsLoading(true);
       setError('');
-      console.log('Searching for:', query);
-      
+
       const response = await searchVideos(query);
-      console.log('Search results:', response);
-      
+
       setVideos(response.data.videos || []);
       setPagination(response.data.pagination || null);
     } catch (err) {

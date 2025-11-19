@@ -39,24 +39,30 @@ const Subscriptions = () => {
 
       {channels.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {channels.map((channel) => (
-            <Link
-              key={channel._id}
-              to={`/channel/${channel.username}`}
-              className="flex flex-col items-center p-4 hover:bg-gray-800 rounded-lg transition"
-            >
-              <img
-                src={channel.avatar}
-                alt={channel.username}
-                className="w-32 h-32 rounded-full object-cover mb-4"
-              />
-              <h3 className="font-medium text-center">{channel.fullname}</h3>
-              <p className="text-sm text-gray-400">@{channel.username}</p>
-              <p className="text-sm text-gray-400 mt-1">
-                {channel.subscribersCount || 0} subscribers
-              </p>
-            </Link>
-          ))}
+          {channels.map((item) => {
+            // Handle both direct channel objects and subscription objects
+            const channel = item.channel || item;
+            if (!channel) return null;
+
+            return (
+              <Link
+                key={channel._id}
+                to={`/channel/${channel.username}`}
+                className="flex flex-col items-center p-4 hover:bg-gray-800 rounded-lg transition"
+              >
+                <img
+                  src={channel.avatar}
+                  alt={channel.username}
+                  className="w-32 h-32 rounded-full object-cover mb-4"
+                />
+                <h3 className="font-medium text-center">{channel.fullname}</h3>
+                <p className="text-sm text-gray-400">@{channel.username}</p>
+                <p className="text-sm text-gray-400 mt-1">
+                  {channel.subscribersCount || 0} subscribers
+                </p>
+              </Link>
+            )
+          })}
         </div>
       ) : (
         <div className="text-center text-gray-400 py-12">

@@ -1,11 +1,13 @@
-import {changePassword, getCurrentUser, getUserChannelProfile, getUserWatchHistory, loginUser, logoutUser, refreshAccessToken, registerUser, updateAccountDetails, updateUserAvatar, updateUsercoverImage} from "../controllers/user.controller.js"
+import {changePassword, getCurrentUser, getUserChannelProfile, getUserWatchHistory, loginUser, logoutUser, refreshAccessToken, registerUser, updateAccountDetails, updateUserAvatar, updateUsercoverImage, forgotPassword, resetPassword} from "../controllers/user.controller.js"
 import {upload} from '../middlewares/multer.middleware.js'
 import { Router} from "express"
 import { verifyJWT } from "../middlewares/auth.middleware.js"
+import { authLimiter } from "../middlewares/rateLimiter.middleware.js"
 
 const router = Router()
 
 router.route("/register").post(
+    authLimiter,
     upload.fields([
         {
             name:"avatar",
@@ -21,7 +23,7 @@ router.route("/register").post(
     // more routes like login change pass etc will also be wrtten here
 
 
-router.route("/login").post(loginUser)
+router.route("/login").post(authLimiter, loginUser)
 
 router.route("/logout").post(verifyJWT , logoutUser)
 
@@ -40,5 +42,9 @@ router.route("/updateUsercoverImage").patch(verifyJWT , upload.single("coverImag
 router.route("/c/:username").get(getUserChannelProfile) // Public route - anyone can view channels
 
 router.route("/history").get(verifyJWT , getUserWatchHistory)
+
+// Password reset routes
+router.route("/forgot-password").post(authLimiter, forgotPassword)
+router.route("/reset-password/:token").post(resetPassword)
 
 export default router

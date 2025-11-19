@@ -24,13 +24,18 @@ import { ThumbsUp, ThumbsDown, Share2, Download } from 'lucide-react';
 /**
  * Format view count and date
  */
+import ShareModal from '../components/ShareModal';
+
+/**
+ * Format view count and date
+ */
 const formatViews = (views) => {
   // Handle undefined, null, or invalid values
   if (!views && views !== 0) return '0';
-  
+
   const viewCount = Number(views);
   if (isNaN(viewCount)) return '0';
-  
+
   if (viewCount >= 1000000) return (viewCount / 1000000).toFixed(1) + 'M';
   if (viewCount >= 1000) return (viewCount / 1000).toFixed(1) + 'K';
   return viewCount.toString();
@@ -44,11 +49,23 @@ const formatDate = (date) => {
   });
 };
 
+const formatDuration = (seconds) => {
+  if (!seconds) return '00:00';
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = Math.floor(seconds % 60);
+
+  if (h > 0) {
+    return `${h}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  }
+  return `${m}:${s.toString().padStart(2, '0')}`;
+};
+
 const Watch = () => {
   // Get videoId from URL parameters
   // URL: /watch/:videoId
   const { videoId } = useParams();
-  
+
   const { user, isAuthenticated } = useAuth();
 
   // State
@@ -59,9 +76,13 @@ const Watch = () => {
   const [isLiked, setIsLiked] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [showFullDescription, setShowFullDescription] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
 
   useEffect(() => {
     if (videoId) {
+      // Scroll to top when video changes
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      
       fetchVideo();
       fetchRelatedVideos();
     }
@@ -71,11 +92,9 @@ const Watch = () => {
     try {
       setIsLoading(true);
       setError(null);
-      
-      console.log('Fetching video:', videoId); // Debug log
+
       const response = await getVideoById(videoId);
-      console.log('Video response:', response); // Debug log
-      
+
       setVideo(response.data);
     } catch (error) {
       console.error('Failed to fetch video:', error);
@@ -129,7 +148,7 @@ const Watch = () => {
       <div className="flex flex-col items-center justify-center min-h-screen">
         <p className="text-red-500 text-xl mb-4">⚠️ Error Loading Video</p>
         <p className="text-gray-400">{error}</p>
-        <button 
+        <button
           onClick={fetchVideo}
           className="mt-4 px-6 py-2 bg-blue-500 hover:bg-blue-600 rounded"
         >
@@ -156,6 +175,7 @@ const Watch = () => {
           {/* Video player */}
           <div className="bg-black rounded-lg overflow-hidden">
             <video
+              key={videoId}
               controls
               autoPlay
               className="w-full aspect-video"
@@ -177,51 +197,52 @@ const Watch = () => {
             </div>
 
             {/* Action buttons */}
-            <div className="flex items-center justify-between mt-4 pb-4 border-b border-gray-700">
+            <div className="flex flex-wrap items-center justify-between gap-4 mt-4 pb-4 border-b border-gray-700">
               {/* Channel info */}
               <div className="flex items-center gap-4">
-                <Link to={`/channel/${video.owner?.username}`}>
+                <Link to={`/channel/${video.owner?.username}`} className="flex-shrink-0">
                   <img
                     src={video.owner?.avatar}
                     alt={video.owner?.username}
-                    className="w-12 h-12 rounded-full"
+                    className="w-12 h-12 rounded-full object-cover"
                   />
                 </Link>
-                <div>
+                <div className="min-w-0">
                   <Link to={`/channel/${video.owner?.username}`}>
-                    <p className="font-medium hover:text-blue-400">
+                    <p className="font-medium hover:text-blue-400 truncate">
                       {video.owner?.fullname}
                     </p>
                   </Link>
-                  <p className="text-sm text-gray-400">
+                  <p className="text-sm text-gray-400 truncate">
                     {video.owner?.subscribersCount || 0} subscribers
                   </p>
                 </div>
                 <button
                   onClick={handleSubscribe}
-                  className={`ml-4 px-6 py-2 rounded-full font-medium ${
-                    isSubscribed
-                      ? 'bg-gray-700 hover:bg-gray-600'
-                      : 'bg-red-600 hover:bg-red-700'
-                  }`}
+                  className={`px-6 py-2 rounded-full font-medium whitespace-nowrap ${isSubscribed
+                    ? 'bg-gray-700 hover:bg-gray-600'
+                    : 'bg-red-600 hover:bg-red-700'
+                    }`}
                 >
                   {isSubscribed ? 'Subscribed' : 'Subscribe'}
                 </button>
               </div>
 
               {/* Like, Share, Save buttons */}
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <button
                   onClick={handleLike}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-full ${
-                    isLiked ? 'bg-blue-600' : 'bg-gray-700 hover:bg-gray-600'
-                  }`}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full transition-colors whitespace-nowrap ${isLiked ? 'bg-blue-800 text-white' : 'bg-gray-700 hover:bg-gray-600'
+                    }`}
                 >
-                  <ThumbsUp className="w-5 h-5" />
-                  <span>Like</span>
+                  <ThumbsUp className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`} />
+                  <span>{isLiked ? 'Liked' : 'Like'}</span>
                 </button>
 
-                <button className="flex items-center gap-2 px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-full">
+                <button
+                  onClick={() => setShowShareModal(true)}
+                  className="flex items-center gap-2 px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-full whitespace-nowrap"
+                >
                   <Share2 className="w-5 h-5" />
                   <span>Share</span>
                 </button>
@@ -258,18 +279,23 @@ const Watch = () => {
               <Link
                 key={relatedVideo._id}
                 to={`/watch/${relatedVideo._id}`}
-                className="flex gap-2 hover:bg-gray-800 rounded p-2"
+                className="flex gap-2 hover:bg-gray-800 rounded p-2 group"
               >
-                <img
-                  src={relatedVideo.thumbnail}
-                  alt={relatedVideo.title}
-                  className="w-40 h-24 object-cover rounded"
-                />
-                <div className="flex-1">
-                  <h4 className="font-medium text-sm line-clamp-2">
+                <div className="relative w-40 h-24 flex-shrink-0">
+                  <img
+                    src={relatedVideo.thumbnail}
+                    alt={relatedVideo.title}
+                    className="w-full h-full object-cover rounded"
+                  />
+                  <span className="absolute bottom-1 right-1 bg-black/80 text-white text-xs px-1 rounded">
+                    {formatDuration(relatedVideo.duration)}
+                  </span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h4 className="font-medium text-sm line-clamp-2 group-hover:text-blue-400 transition-colors">
                     {relatedVideo.title}
                   </h4>
-                  <p className="text-sm text-gray-400 mt-1">
+                  <p className="text-sm text-gray-400 mt-1 truncate">
                     {relatedVideo.owner?.username}
                   </p>
                   <p className="text-xs text-gray-400">
@@ -281,6 +307,13 @@ const Watch = () => {
           </div>
         </div>
       </div>
+
+      <ShareModal
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        videoUrl={window.location.href}
+        title={video.title}
+      />
     </div>
   );
 };

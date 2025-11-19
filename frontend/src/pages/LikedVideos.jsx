@@ -18,16 +18,13 @@ const LikedVideos = () => {
 
   const fetchLikedVideos = async () => {
     try {
-      console.log('Fetching liked videos...');
       const response = await getLikedVideos();
-      console.log('Liked videos response:', response);
-      
+
       // Backend returns array of Like objects, each with a 'video' field
       // Extract the actual video objects
-      const likedVideosData = response.data || [];
-      const videosList = likedVideosData.map(like => like.video).filter(video => video); // Filter out null videos
-      
-      console.log('Extracted videos:', videosList);
+      const likedVideosData = Array.isArray(response.data) ? response.data : [];
+      const videosList = likedVideosData.map(like => like.video).filter(video => video);
+
       setVideos(videosList);
     } catch (error) {
       console.error('Failed to fetch liked videos:', error);

@@ -148,6 +148,13 @@ const Login = () => {
             {isLoading ? 'Signing in...' : 'Sign In'}
           </button>
 
+          {/* Forgot password link */}
+          <div className="text-center">
+            <Link to="/forgot-password" className="text-sm text-yt-blue hover:underline">
+              Forgot your password?
+            </Link>
+          </div>
+
           {/* Link to register page */}
           <p className="text-center text-gray-400">
             Don't have an account?{' '}

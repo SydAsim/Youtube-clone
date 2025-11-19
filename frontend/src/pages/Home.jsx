@@ -42,16 +42,11 @@ const Home = () => {
    */
   const fetchVideos = async () => {
     try {
-      console.log('Fetching home feed...'); // Debug log
       const response = await getHomeFeed();
-      console.log('Home feed response:', response); // Debug log
       setVideos(response.data || []);
     } catch (err) {
-      console.error('Failed to fetch videos:', err);
-      console.error('Error details:', err.response); // More details
       setError('Failed to load videos. Please try again.');
     } finally {
-      // This runs whether try succeeds or catch fails
       setIsLoading(false);
     }
   };
@@ -78,21 +73,13 @@ const Home = () => {
   }
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">Recommended Videos</h1>
-
+    <div className="p-3 sm:p-4 md:p-6 max-w-[2000px] mx-auto">
       {videos.length === 0 ? (
-        <div className="text-center text-gray-400 py-12">
+        <div className="text-center text-yt-text-secondary py-12">
           <p>No videos available</p>
         </div>
       ) : (
-        // Responsive grid layout
-        // grid: Enable CSS Grid
-        // grid-cols-1: 1 column on mobile
-        // sm:grid-cols-2: 2 columns on small screens
-        // lg:grid-cols-3: 3 columns on large screens
-        // xl:grid-cols-4: 4 columns on extra large screens
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-x-4 gap-y-10">
           {videos.map((video) => (
             <VideoCard key={video._id} video={video} />
           ))}

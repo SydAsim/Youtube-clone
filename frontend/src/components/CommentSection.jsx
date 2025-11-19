@@ -11,11 +11,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { 
-  getVideoComments, 
-  addComment, 
-  updateComment, 
-  deleteComment 
+import {
+  getVideoComments,
+  addComment,
+  updateComment,
+  deleteComment
 } from '../services/commentService';
 import { toggleCommentLike } from '../services/likeService';
 import { ThumbsUp, Trash2, Edit2 } from 'lucide-react';
@@ -43,7 +43,7 @@ const Comment = ({ comment, onUpdate, onDelete, onLike }) => {
         alt={comment.owner?.username}
         className="w-10 h-10 rounded-full"
       />
-      
+
       <div className="flex-1">
         <div className="flex items-center gap-2">
           <span className="font-medium">{comment.owner?.username}</span>
@@ -78,13 +78,13 @@ const Comment = ({ comment, onUpdate, onDelete, onLike }) => {
         ) : (
           <>
             <p className="mt-1 text-gray-200">{comment.content}</p>
-            
+
             <div className="flex items-center gap-4 mt-2">
               <button
                 onClick={() => onLike(comment._id)}
-                className="flex items-center gap-1 hover:text-blue-500"
+                className={`flex items-center gap-1 ${comment.isLiked ? 'text-blue-500' : 'hover:text-blue-500'}`}
               >
-                <ThumbsUp className="w-4 h-4" />
+                <ThumbsUp className={`w-4 h-4 ${comment.isLiked ? 'fill-current' : ''}`} />
                 <span className="text-sm">{comment.likesCount || 0}</span>
               </button>
 
@@ -132,13 +132,12 @@ const CommentSection = ({ videoId }) => {
   const fetchComments = async () => {
     try {
       const response = await getVideoComments(videoId);
-      console.log('Comments response:', response); // Debug log
-      
+
       // Ensure comments is always an array
-      const commentsData = Array.isArray(response.data) 
-        ? response.data 
+      const commentsData = Array.isArray(response.data)
+        ? response.data
         : (response.data?.comments || []);
-      
+
       setComments(commentsData);
     } catch (error) {
       console.error('Failed to fetch comments:', error);
@@ -164,7 +163,7 @@ const CommentSection = ({ videoId }) => {
   const handleUpdateComment = async (commentId, content) => {
     try {
       await updateComment(commentId, content);
-      setComments(comments.map(c => 
+      setComments(comments.map(c =>
         c._id === commentId ? { ...c, content } : c
       ));
     } catch (error) {

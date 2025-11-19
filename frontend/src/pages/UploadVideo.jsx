@@ -78,15 +78,8 @@ const UploadVideo = () => {
     setIsUploading(true);
     setUploadProgress(0);
 
-    // Debug logging
-    console.log('Starting video upload...');
-    console.log('Video file:', formData.videoFile);
-    console.log('Thumbnail:', formData.thumbnail);
-    console.log('Title:', formData.title);
-    console.log('Description:', formData.description);
-
     try {
-      // Simulate upload progress (in real app, use axios onUploadProgress)
+      // Simulate upload progress
       const progressInterval = setInterval(() => {
         setUploadProgress((prev) => {
           if (prev >= 90) {
@@ -97,10 +90,8 @@ const UploadVideo = () => {
         });
       }, 500);
 
-      console.log('Calling publishVideo API...');
       const response = await publishVideo(formData);
-      console.log('Upload response:', response);
-      
+
       clearInterval(progressInterval);
       setUploadProgress(100);
 
@@ -110,7 +101,7 @@ const UploadVideo = () => {
       console.error('Upload failed:', err);
       console.error('Error response:', err.response);
       console.error('Error data:', err.response?.data);
-      
+
       const errorMessage = err.response?.data?.message || err.message || 'Upload failed. Please try again.';
       setError(errorMessage);
     } finally {

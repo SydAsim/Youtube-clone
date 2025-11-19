@@ -40,9 +40,7 @@ const Channel = () => {
 
   const fetchChannelData = async () => {
     try {
-      console.log('Fetching channel for username:', username);
       const response = await getUserChannelProfile(username);
-      console.log('Channel data received:', response.data);
       setChannel(response.data);
       setIsSubscribed(response.data?.isSubscribed || false);
 
@@ -85,20 +83,18 @@ const Channel = () => {
     try {
       await toggleSubscription(channel._id);
       setIsSubscribed(!isSubscribed);
-      
+
       // Update subscriber count
       setChannel({
         ...channel,
-        subscribersCount: isSubscribed 
-          ? channel.subscribersCount - 1 
+        subscribersCount: isSubscribed
+          ? channel.subscribersCount - 1
           : channel.subscribersCount + 1
       });
     } catch (error) {
       console.error('Failed to subscribe:', error);
     }
   };
-
-  const isOwnChannel = currentUser?._id === channel?._id;
 
   if (isLoading) return <LoadingSpinner size="lg" />;
 
@@ -137,21 +133,20 @@ const Channel = () => {
             <div className="flex-1">
               <h1 className="text-3xl font-bold">{channel.fullname}</h1>
               <p className="text-gray-400 mt-1">@{channel.username}</p>
-              
+
               <div className="flex items-center gap-4 mt-2 text-gray-400">
                 <span>{channel.subscriberCount || 0} subscribers</span>
                 <span>•</span>
                 <span>{videos.length} videos</span>
               </div>
 
-              {!isOwnChannel && (
+              {isAuthenticated && (
                 <button
                   onClick={handleSubscribe}
-                  className={`mt-4 px-8 py-2 rounded-full font-medium ${
-                    isSubscribed
-                      ? 'bg-gray-700 hover:bg-gray-600'
-                      : 'bg-red-600 hover:bg-red-700'
-                  }`}
+                  className={`mt-4 px-8 py-2 rounded-full font-medium ${isSubscribed
+                    ? 'bg-gray-700 hover:bg-gray-600'
+                    : 'bg-red-600 hover:bg-red-700'
+                    }`}
                 >
                   {isSubscribed ? 'Subscribed' : 'Subscribe'}
                 </button>
@@ -163,31 +158,28 @@ const Channel = () => {
           <div className="flex gap-8 mt-8 border-b border-gray-700">
             <button
               onClick={() => setActiveTab('videos')}
-              className={`pb-3 font-medium ${
-                activeTab === 'videos'
-                  ? 'border-b-2 border-white'
-                  : 'text-gray-400'
-              }`}
+              className={`pb-3 font-medium ${activeTab === 'videos'
+                ? 'border-b-2 border-white'
+                : 'text-gray-400'
+                }`}
             >
               Videos
             </button>
             <button
               onClick={() => setActiveTab('tweets')}
-              className={`pb-3 font-medium ${
-                activeTab === 'tweets'
-                  ? 'border-b-2 border-white'
-                  : 'text-gray-400'
-              }`}
+              className={`pb-3 font-medium ${activeTab === 'tweets'
+                ? 'border-b-2 border-white'
+                : 'text-gray-400'
+                }`}
             >
               Tweets
             </button>
             <button
               onClick={() => setActiveTab('about')}
-              className={`pb-3 font-medium ${
-                activeTab === 'about'
-                  ? 'border-b-2 border-white'
-                  : 'text-gray-400'
-              }`}
+              className={`pb-3 font-medium ${activeTab === 'about'
+                ? 'border-b-2 border-white'
+                : 'text-gray-400'
+                }`}
             >
               About
             </button>

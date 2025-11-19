@@ -8,7 +8,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 
 
 //  GET CHANNEL STATS
- 
+
 const getChannelStats = asynchandler(async (req, res) => {
   const channelId = req.user?._id; // channel = logged in user
 
@@ -34,17 +34,18 @@ const getChannelStats = asynchandler(async (req, res) => {
 
   // 4️ Total views
   const totalViewsAgg = await Video.aggregate([
-    { $match: 
-      { owner: new mongoose.Types.ObjectId(channelId) } //This filters all the Video documents to only those where the owner field matches the given channelId.
-     },
+    {
+      $match:
+        { owner: new mongoose.Types.ObjectId(channelId) } //This filters all the Video documents to only those where the owner field matches the given channelId.
+    },
     { $group: { _id: null, totalViews: { $sum: "$views" } } }, // Here we group all matched documents together (that’s why _id: null — meaning one single group for all results).Then we sum up the views field of all those videos.
   ]);
 
   const totalViews = totalViewsAgg[0]?.totalViews || 0;
-//   The result of aggregation is an array, so we grab the first element ([0]) and safely access its totalViews value (using optional chaining ?.).
-// If no videos exist, it defaults to 0.
- 
-  
+  //   The result of aggregation is an array, so we grab the first element ([0]) and safely access its totalViews value (using optional chaining ?.).
+  // If no videos exist, it defaults to 0.
+
+
   return res
     .status(200)
     .json(
@@ -54,7 +55,7 @@ const getChannelStats = asynchandler(async (req, res) => {
         totalLikes,
         totalViews,
       },
-      "Channel stats fetched successfully")
+        "Channel stats fetched successfully")
     );
 });
 
@@ -71,7 +72,7 @@ const getChannelVideos = asynchandler(async (req, res) => {
 
   const videos = await Video.find({ owner: channelId })
     .sort({ createdAt: -1 }) // newest first
-    .select("title thumbnail views likes createdAt videoFile duration");
+    .select("title thumbnail views likes createdAt videoFile duration isPublished");
 
   return res
     .status(200)
@@ -79,21 +80,19 @@ const getChannelVideos = asynchandler(async (req, res) => {
 });
 
 
-// 
-//  OPTIONAL: HOME FEED CONTROLLER
-// 
-// All videos from all users sorted by views (Top to Low)
+//  GET HOME FEED (PUBLIC)
+
 const getHomeFeed = asynchandler(async (req, res) => {
-  const videos = await Video.find({})
-    .populate("owner", "username avatar fullname") // Referenced Models
-    .sort({ views: -1 }) // top to low
-    .select("title thumbnail views createdAt owner videoFile duration"); // Current Model - added duration
+  // Get all published videos for home feed
+  const videos = await Video.find({ isPublished: true })
+    .sort({ createdAt: -1 }) // newest first
+    .populate("owner", "username fullName avatar")
+    .select("title thumbnail views createdAt videoFile duration");
 
   return res
     .status(200)
-    .json(new ApiResponse(200, videos, "Home feed videos fetched successfully"));
+    .json(new ApiResponse(200, videos, "Home feed fetched successfully"));
 });
-
 
 export {
   getChannelStats,
