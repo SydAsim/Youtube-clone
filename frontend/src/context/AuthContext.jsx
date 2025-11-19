@@ -73,17 +73,24 @@ export const AuthProvider = ({ children }) => {
   const checkAuth = async () => {
     try {
       const accessToken = Cookies.get('accessToken');
+      const isLoggedIn = localStorage.getItem('isLoggedIn');
       
-      if (accessToken) {
+      if (accessToken && isLoggedIn) {
         // Token exists, fetch user data
         const response = await getCurrentUser();
         setUser(response.data);
         setIsAuthenticated(true);
+      } else {
+        // No token or not logged in, clear everything
+        setUser(null);
+        setIsAuthenticated(false);
+        localStorage.removeItem('isLoggedIn');
       }
     } catch (error) {
       console.error('Auth check failed:', error);
       setUser(null);
       setIsAuthenticated(false);
+      localStorage.removeItem('isLoggedIn');
     } finally {
       setIsLoading(false);
     }
@@ -101,6 +108,9 @@ export const AuthProvider = ({ children }) => {
       // Just update the user state
       setUser(response.data.user);
       setIsAuthenticated(true);
+      
+      // Store auth flag in localStorage for persistence
+      localStorage.setItem('isLoggedIn', 'true');
       
       return { success: true, data: response.data };
     } catch (error) {
@@ -127,8 +137,15 @@ export const AuthProvider = ({ children }) => {
       // Clear cookies
       Cookies.remove('accessToken');
       Cookies.remove('refreshToken');
+      
+      // Clear localStorage
+      localStorage.removeItem('isLoggedIn');
     } catch (error) {
       console.error('Logout failed:', error);
+      // Clear state even if API call fails
+      setUser(null);
+      setIsAuthenticated(false);
+      localStorage.removeItem('isLoggedIn');
     }
   };
 
