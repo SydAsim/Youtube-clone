@@ -23,7 +23,7 @@ import Cookies from 'js-cookie';
 // baseURL: All API calls will be prefixed with backend URL
 // withCredentials: Include cookies in cross-origin requests (needed for authentication)
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'https://youtube-backend.fly.dev/api/v1',
+  baseURL: import.meta.env.VITE_API_URL,
   withCredentials: true,  // Important: Sends cookies with every request
   timeout: 15000,  // Increased to 15 seconds for network delays
   headers: {
