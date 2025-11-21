@@ -48,8 +48,8 @@ const publishAVideo = asynchandler(async (req, res) => {
   const videoDuration = videoUpload.duration || 0;
 
   const publishedVideo = await Video.create({
-    videoFile: videoUpload.url,
-    thumbnail: thumbnailUpload.url,
+    videoFile: videoUpload.secure_url,
+    thumbnail: thumbnailUpload.secure_url,
     title,
     description,
     duration: Math.round(videoDuration), // Round to nearest second
@@ -62,7 +62,6 @@ const publishAVideo = asynchandler(async (req, res) => {
     .json(new ApiResponse(200, publishedVideo, "VideoPublised Successfully"))
 
 })
-
 
 
 
@@ -98,10 +97,10 @@ const updateVideo = asynchandler(async (req, res) => {
   if (thumbnailLocalFilePath) {
     const thumbnail = await uploadonCloudinary(thumbnailLocalFilePath)
 
-    if (!thumbnail?.url) {
+    if (!thumbnail?.secure_url) {
       throw new ApiError(400, "Thumbnail upload on Cloudinary failed")
     }
-    thumbnailurl = thumbnail.url // replace the new with old one
+    thumbnailurl = thumbnail.secure_url // replace the new with old one
   }
 
   if (!isValidObjectId(videoId)) {
@@ -170,6 +169,7 @@ const getVideoById = asynchandler(async (req, res) => {
   // Increment view count logic
   let shouldIncrementView = true
 
+  
   // 1. Don't count if user is viewing their own video
   if (userId && video.owner._id.toString() === userId.toString()) {
     shouldIncrementView = false

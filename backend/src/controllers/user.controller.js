@@ -92,8 +92,8 @@ const registerUser = asynchandler(async (req, res) => {
         fullname,
         email,
         password,
-        avatar: avatar.url,
-        coverImage: coverImage?.url || ""
+        avatar: avatar.secure_url,
+        coverImage: coverImage?.secure_url || ""
     })
 
     // 5:Confirm that is User registered or not 
@@ -307,7 +307,7 @@ const updateUserAvatar = asynchandler(async (req, res) => {
     }
 
     const avatar = await uploadonCloudinary(avatarLocalPath)
-    if (!avatar.url) {
+    if (!avatar.secure_url) {
         throw new ApiError(400, "Error while uploading avatar")
     }
 
@@ -316,7 +316,7 @@ const updateUserAvatar = asynchandler(async (req, res) => {
         req.user?._id,
 
         {
-            $set: { avatar: avatar.url }
+            $set: { avatar: avatar.secure_url }
         },
 
         { new: true }
@@ -340,7 +340,7 @@ const updateUsercoverImage = asynchandler(async (req, res) => {
     }
 
     const coverImage = await uploadonCloudinary(coverImageLocalPath)
-    if (!coverImage.url) {
+    if (!coverImage.secure_url) {
         throw new ApiError(400, "CoverImage Upload failed")
     }
 
@@ -348,7 +348,7 @@ const updateUsercoverImage = asynchandler(async (req, res) => {
         req.user?._id,
         {
             $set: {
-                coverImage: coverImage.url
+                coverImage: coverImage.secure_url
             }
         },
         { new: true }
