@@ -184,22 +184,38 @@ const getVideoById = asynchandler(async (req, res) => {
         try {
           await View.create({ video: videoId, viewer: userId })
 
-          // Only add to watch history if view was successfully created
-          await User.findByIdAndUpdate(
-            userId,
-            {
-              $addToSet: { watchHistory: videoId } // $addToSet prevents duplicates
-            }
-          ).catch(err => console.error('Watch history update failed:', err))
-
           // Increment view count only on first view
           video.views = (video.views || 0) + 1
           await video.save()
         } catch (viewError) {
-          // If duplicate view (already viewed), don't increment or add to history
+          // If duplicate view (already viewed), don't increment view count
           if (viewError.code !== 11000) {
             console.error('Error creating view record:', viewError)
           }
+        }
+
+        // Always update watch history (even for repeat views)
+        // Remove video if it exists, then add it to the beginning
+        try {
+          await User.findByIdAndUpdate(
+            userId,
+            {
+              $pull: { watchHistory: videoId } // Remove if exists
+            }
+          )
+          await User.findByIdAndUpdate(
+            userId,
+            {
+              $push: { 
+                watchHistory: {
+                  $each: [videoId],
+                  $position: 0 // Add to beginning (most recent first)
+                }
+              }
+            }
+          )
+        } catch (err) {
+          console.error('Watch history update failed:', err)
         }
       } else {
         // For anonymous users (by IP)
