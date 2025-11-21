@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Diagnostic Page</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #1a1a1a; color: #0f0; }
+        .success { color: #0f0; }
+        .error { color: #f00; }
+        pre { background: #000; padding: 10px; border: 1px solid #0f0; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Render Diagnostic Page</h1>
+    
+    <h2>Current URL:</h2>
+    <pre id="url"></pre>
+    
+    <h2>Tests:</h2>
+    <div id="tests"></div>
+    
+    <script>
+        document.getElementById('url').textContent = window.location.href;
+        
+        const tests = document.getElementById('tests');
+        
+        async function runTests() {
+            // Test 1: Can we load the main JS?
+            try {
+                const response = await fetch('/assets/index-Cd6AVo9-.js', { method: 'HEAD' });
+                tests.innerHTML += `<p class="success">✅ Main JS exists (${response.status})</p>`;
+            } catch (e) {
+                tests.innerHTML += `<p class="error">❌ Main JS not found</p>`;
+            }
+            
+            // Test 2: Can we load index.html?
+            try {
+                const response = await fetch('/index.html');
+                tests.innerHTML += `<p class="success">✅ index.html exists (${response.status})</p>`;
+            } catch (e) {
+                tests.innerHTML += `<p class="error">❌ index.html not found</p>`;
+            }
+            
+            // Test 3: What's at /login?
+            try {
+                const response = await fetch('/login');
+                const text = await response.text();
+                if (text.includes('<!doctype html>')) {
+                    tests.innerHTML += `<p class="success">✅ /login serves HTML</p>`;
+                } else {
+                    tests.innerHTML += `<p class="error">❌ /login doesn't serve HTML</p>`;
+                }
+            } catch (e) {
+                tests.innerHTML += `<p class="error">❌ /login failed: ${e.message}</p>`;
+            }
+            
+            // Test 4: Check _redirects
+            try {
+                const response = await fetch('/_redirects');
+                const text = await response.text();
+                tests.innerHTML += `<p class="success">✅ _redirects exists</p>`;
+                tests.innerHTML += `<pre>${text}</pre>`;
+            } catch (e) {
+                tests.innerHTML += `<p class="error">❌ _redirects not found</p>`;
+            }
+        }
+        
+        runTests();
+    </script>
+    
+    <h2>Instructions:</h2>
+    <ol>
+        <li>If you see this page, static files are being served</li>
+        <li>Check the tests above</li>
+        <li>If /login doesn't serve HTML, _redirects is not working</li>
+        <li>This means service is NOT a Static Site</li>
+    </ol>
+    
+    <p><a href="/">Go to Home</a> | <a href="/login">Go to Login</a></p>
+</body>
+</html>
