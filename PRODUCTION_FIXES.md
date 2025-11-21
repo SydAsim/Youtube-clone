@@ -99,11 +99,13 @@ The `.env.production` file will be used automatically during build.
 - **Reason:** Default 15-second timeout was too short for file uploads on free tier hosting
 
 ### ✅ 8. Frontend - Fixed SPA Routing on Refresh
-**Files:** `frontend/_redirects`, `frontend/vite.config.js`, `frontend/render.yaml`
-- **Added:** `_redirects` file with `/* /index.html 200` rule
-- **Updated:** Vite config to copy `_redirects` to `dist` folder during build
+**Files:** `frontend/public/_redirects`, `frontend/render.yaml`, `frontend/vercel.json`
+- **Added:** `public/_redirects` file with `/* /index.html 200` rule (Vite auto-copies to dist)
 - **Added:** `render.yaml` for Render-specific configuration
+- **Added:** `vercel.json` for Vercel deployment (alternative)
+- **Created:** `DEPLOYMENT_CHECKLIST.md` with testing guide
 - **Reason:** When refreshing on routes like `/login`, server was returning 404 instead of serving the SPA
+- **Affected Routes:** All routes including `/login`, `/watch/:id`, `/channel/:username`, etc.
 
 ## Testing
 

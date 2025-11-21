@@ -1,6 +1,5 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import { copyFileSync } from 'fs'
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -15,19 +14,7 @@ export default defineConfig({
       // }
     }
   },
-  plugins: [
-    react(),
-    {
-      name: 'copy-redirects',
-      closeBundle() {
-        // Copy _redirects file to dist folder after build
-        try {
-          copyFileSync('_redirects', 'dist/_redirects')
-          console.log('✅ _redirects file copied to dist/')
-        } catch (err) {
-          console.error('❌ Failed to copy _redirects:', err)
-        }
-      }
-    }
-  ],
+  plugins: [react()],
+  // Vite automatically copies everything from public/ to dist/
+  // So public/_redirects will be copied to dist/_redirects
 })
