@@ -89,11 +89,22 @@ The `.env.production` file will be used automatically during build.
    - Refresh token sent automatically via httpOnly cookie
    - Backend returns new tokens as httpOnly cookies
 
+### ✅ 7. Frontend - Fixed Upload Timeouts
+**Files:** `frontend/src/services/videoService.js`, `frontend/src/services/userService.js`
+- **Changed:** Increased timeout for file uploads:
+  - Video upload: 300 seconds (5 minutes)
+  - Video update: 180 seconds (3 minutes)
+  - Image uploads: 60 seconds (1 minute)
+  - Registration: 60 seconds (1 minute)
+- **Reason:** Default 15-second timeout was too short for file uploads on free tier hosting
+
 ## Testing
 
 After deployment, verify:
-- [ ] Login works and sets cookies
-- [ ] Protected routes work (likes, subscriptions, etc.)
-- [ ] Token refresh works on 401 errors
-- [ ] No mixed content warnings
-- [ ] No CORS errors in console
+- [x] Login works and sets cookies
+- [x] Protected routes work (likes, subscriptions, etc.)
+- [x] Token refresh works on 401 errors
+- [x] No mixed content warnings
+- [x] No CORS errors in console
+- [ ] Video upload works without timeout errors
+- [ ] Image uploads work (avatar, cover image)

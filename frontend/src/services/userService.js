@@ -42,6 +42,7 @@ export const registerUser = async (userData) => {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
+    timeout: 60000, // 1 minute for registration with images
   });
   
   return response.data;
@@ -140,6 +141,7 @@ export const updateUserAvatar = async (avatar) => {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
+    timeout: 60000, // 1 minute for image upload
   });
   
   return response.data;
@@ -158,6 +160,7 @@ export const updateUserCoverImage = async (coverImage) => {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
+    timeout: 60000, // 1 minute for image upload
   });
   
   return response.data;

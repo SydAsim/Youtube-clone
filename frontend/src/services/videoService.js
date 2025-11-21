@@ -59,6 +59,7 @@ export const publishVideo = async (videoData) => {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
+    timeout: 300000, // 5 minutes for video upload
   });
   
   return response.data;
@@ -82,6 +83,7 @@ export const updateVideo = async (videoId, updates) => {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
+    timeout: 180000, // 3 minutes for thumbnail update
   });
   
   return response.data;
