@@ -67,12 +67,13 @@ const MyVideos = () => {
   if (isLoading) return <LoadingSpinner size="lg" />;
 
   return (
-    <div className="p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Your Videos</h1>
+    <div className="p-4 md:p-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+        <h1 className="text-xl md:text-2xl font-bold">Your Videos</h1>
         <Link
           to="/upload"
-          className="px-6 py-2 bg-blue-500 hover:bg-blue-600 rounded-lg font-medium"
+          className="w-full sm:w-auto text-center px-4 md:px-6 py-2 bg-blue-500 hover:bg-blue-600 rounded-lg font-medium"
         >
           Upload Video
         </Link>
@@ -81,55 +82,56 @@ const MyVideos = () => {
       {videos.length > 0 ? (
         <div className="space-y-4">
           {videos.map((video) => (
-            <div key={video._id} className="bg-gray-800 rounded-lg p-4 flex gap-4">
+            <div key={video._id} className="bg-gray-800 rounded-lg p-3 md:p-4 flex flex-col sm:flex-row gap-3 md:gap-4">
               {/* Thumbnail */}
-              <Link to={`/watch/${video._id}`} className="flex-shrink-0">
+              <Link to={`/watch/${video._id}`} className="flex-shrink-0 w-full sm:w-48">
                 <img
                   src={video.thumbnail}
                   alt={video.title}
-                  className="w-48 h-27 object-cover rounded"
+                  className="w-full sm:w-48 h-auto sm:h-27 object-cover rounded"
                 />
               </Link>
 
               {/* Video info */}
-              <div className="flex-1">
+              <div className="flex-1 min-w-0">
                 <Link to={`/watch/${video._id}`}>
-                  <h3 className="text-lg font-medium hover:text-blue-400 line-clamp-2">
+                  <h3 className="text-base md:text-lg font-medium hover:text-blue-400 line-clamp-2">
                     {video.title}
                   </h3>
                 </Link>
 
-                <p className="text-sm text-gray-400 mt-1 line-clamp-2">
+                <p className="text-xs md:text-sm text-gray-400 mt-1 line-clamp-2">
                   {video.description}
                 </p>
 
-                <div className="flex items-center gap-4 mt-3 text-sm text-gray-400">
+                <div className="flex flex-wrap items-center gap-2 md:gap-4 mt-2 md:mt-3 text-xs md:text-sm text-gray-400">
                   <span>{formatViews(video.views)} views</span>
-                  <span>•</span>
+                  <span className="hidden sm:inline">•</span>
                   <span>{new Date(video.createdAt).toLocaleDateString()}</span>
-                  <span>•</span>
+                  <span className="hidden sm:inline">•</span>
                   <span className={video.isPublished ? 'text-green-500' : 'text-yellow-500'}>
                     {video.isPublished ? 'Published' : 'Private'}
                   </span>
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center gap-3 mt-4">
+                <div className="flex flex-wrap items-center gap-2 md:gap-3 mt-3 md:mt-4">
                   <button
                     onClick={() => handleTogglePublish(video._id, video.isPublished)}
-                    className={`flex items-center gap-2 px-3 py-1 rounded text-sm ${video.isPublished
+                    className={`flex items-center gap-1 md:gap-2 px-2 md:px-3 py-1 rounded text-xs md:text-sm ${video.isPublished
                       ? 'bg-yellow-600 hover:bg-yellow-700'
                       : 'bg-green-600 hover:bg-green-700'
                       }`}
                   >
                     {video.isPublished ? (
                       <>
-                        <EyeOff className="w-4 h-4" />
-                        <span>Make Private</span>
+                        <EyeOff className="w-3 h-3 md:w-4 md:h-4" />
+                        <span className="hidden sm:inline">Make Private</span>
+                        <span className="sm:hidden">Private</span>
                       </>
                     ) : (
                       <>
-                        <Eye className="w-4 h-4" />
+                        <Eye className="w-3 h-3 md:w-4 md:h-4" />
                         <span>Publish</span>
                       </>
                     )}
@@ -137,17 +139,17 @@ const MyVideos = () => {
 
                   <Link
                     to={`/edit-video/${video._id}`}
-                    className="flex items-center gap-2 px-3 py-1 bg-blue-600 hover:bg-blue-700 rounded text-sm"
+                    className="flex items-center gap-1 md:gap-2 px-2 md:px-3 py-1 bg-blue-600 hover:bg-blue-700 rounded text-xs md:text-sm"
                   >
-                    <Edit2 className="w-4 h-4" />
+                    <Edit2 className="w-3 h-3 md:w-4 md:h-4" />
                     <span>Edit</span>
                   </Link>
 
                   <button
                     onClick={() => handleDeleteVideo(video._id)}
-                    className="flex items-center gap-2 px-3 py-1 bg-red-600 hover:bg-red-700 rounded text-sm"
+                    className="flex items-center gap-1 md:gap-2 px-2 md:px-3 py-1 bg-red-600 hover:bg-red-700 rounded text-xs md:text-sm"
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Trash2 className="w-3 h-3 md:w-4 md:h-4" />
                     <span>Delete</span>
                   </button>
                 </div>
@@ -157,10 +159,10 @@ const MyVideos = () => {
         </div>
       ) : (
         <div className="text-center text-gray-400 py-12">
-          <p className="text-xl mb-4">No videos uploaded yet</p>
+          <p className="text-lg md:text-xl mb-4">No videos uploaded yet</p>
           <Link
             to="/upload"
-            className="inline-block px-6 py-3 bg-blue-500 hover:bg-blue-600 rounded-lg font-medium text-white"
+            className="inline-block px-4 md:px-6 py-2 md:py-3 bg-blue-500 hover:bg-blue-600 rounded-lg font-medium text-white text-sm md:text-base"
           >
             Upload Your First Video
           </Link>
