@@ -86,9 +86,8 @@ api.interceptors.response.use(
         const refreshToken = Cookies.get('refreshToken');
 
         if (refreshToken) {
-          await axios.post('/api/v1/users/accessrefreshtoken', {
-            refreshToken
-          }, { withCredentials: true });
+          await api.post('/users/accessrefreshtoken', { refreshToken });
+
 
           // Retry the original request
           return api(originalRequest);
