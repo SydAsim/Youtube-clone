@@ -69,24 +69,20 @@ export const AuthProvider = ({ children }) => {
   /**
    * Check if user is authenticated
    * Called on app load to restore login state
+   * 
+   * Note: We can't read httpOnly cookies with JavaScript (security feature)
+   * Instead, we try to fetch current user - if it succeeds, user is logged in
    */
   const checkAuth = async () => {
     try {
-      const accessToken = Cookies.get('accessToken');
-      const isLoggedIn = localStorage.getItem('isLoggedIn');
-      
-      if (accessToken && isLoggedIn) {
-        // Token exists, fetch user data
-        const response = await getCurrentUser();
-        setUser(response.data);
-        setIsAuthenticated(true);
-      } else {
-        // No token or not logged in, clear everything
-        setUser(null);
-        setIsAuthenticated(false);
-        localStorage.removeItem('isLoggedIn');
-      }
+      // Try to fetch current user
+      // If httpOnly cookie exists, backend will authenticate the request
+      const response = await getCurrentUser();
+      setUser(response.data);
+      setIsAuthenticated(true);
+      localStorage.setItem('isLoggedIn', 'true');
     } catch (error) {
+      // If request fails (401), user is not authenticated
       console.error('Auth check failed:', error);
       setUser(null);
       setIsAuthenticated(false);
@@ -125,6 +121,9 @@ export const AuthProvider = ({ children }) => {
   /**
    * Logout function
    * Clear user state and cookies
+   * 
+   * Note: httpOnly cookies are cleared by the backend
+   * We just need to clear local state
    */
   const logout = async () => {
     try {
@@ -134,12 +133,11 @@ export const AuthProvider = ({ children }) => {
       setUser(null);
       setIsAuthenticated(false);
       
-      // Clear cookies
-      Cookies.remove('accessToken');
-      Cookies.remove('refreshToken');
-      
       // Clear localStorage
       localStorage.removeItem('isLoggedIn');
+      
+      // Note: httpOnly cookies are cleared by backend
+      // No need to manually remove them here
     } catch (error) {
       console.error('Logout failed:', error);
       // Clear state even if API call fails
