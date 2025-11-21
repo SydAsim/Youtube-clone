@@ -22,7 +22,6 @@
 
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { loginUser as loginUserAPI, logoutUser as logoutUserAPI, getCurrentUser } from '../services/userService';
-import Cookies from 'js-cookie';
 
 // Create Context
 // This creates a "container" for our authentication state
