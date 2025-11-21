@@ -5,14 +5,14 @@ import jwt from "jsonwebtoken"
 
 export const verifyJWT = asynchandler(async (req, res, next) => {
     try {
-        // Hey, I’m a logged-in user, here’s my token as proof
+        // Hey, I'm a logged-in user, here's my token as proof
         // The one who bears (carries) this token is authorized.
         const token = req.cookies?.accessToken ||
             req.header("Authorization")?.replace("Bearer ", "")
 
 
         if (!token) {
-            throw new ApiError(400, "Unauthorized Request")
+            throw new ApiError(401, "Unauthorized Request - No token provided")
         }
 
         const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
@@ -22,14 +22,19 @@ export const verifyJWT = asynchandler(async (req, res, next) => {
         )
 
         if (!user) {
-            throw new ApiError(400, "invalid Access TOken")
+            throw new ApiError(401, "Invalid Access Token - User not found")
         }
 
         req.user = user
         next()
     } catch (error) {
-        throw new ApiError(400, error?.message || "Invalid Acess Token")
-
+        if (error.name === 'JsonWebTokenError') {
+            throw new ApiError(401, "Invalid Access Token")
+        }
+        if (error.name === 'TokenExpiredError') {
+            throw new ApiError(401, "Access Token Expired")
+        }
+        throw new ApiError(401, error?.message || "Unauthorized")
     }
 
 })
