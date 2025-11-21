@@ -98,6 +98,13 @@ The `.env.production` file will be used automatically during build.
   - Registration: 60 seconds (1 minute)
 - **Reason:** Default 15-second timeout was too short for file uploads on free tier hosting
 
+### ✅ 8. Frontend - Fixed SPA Routing on Refresh
+**Files:** `frontend/_redirects`, `frontend/vite.config.js`, `frontend/render.yaml`
+- **Added:** `_redirects` file with `/* /index.html 200` rule
+- **Updated:** Vite config to copy `_redirects` to `dist` folder during build
+- **Added:** `render.yaml` for Render-specific configuration
+- **Reason:** When refreshing on routes like `/login`, server was returning 404 instead of serving the SPA
+
 ## Testing
 
 After deployment, verify:
