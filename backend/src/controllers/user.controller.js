@@ -149,8 +149,8 @@ const loginUser = asynchandler(async (req, res) => {
 
     const options = {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // 'none' for cross-domain in production
+        secure: true, // Always use secure in production
+        sameSite: 'none', // Required for cross-domain cookies
         maxAge: 24 * 60 * 60 * 1000, // 1 day
         path: '/' // Ensure cookie is available on all paths
     }
@@ -185,16 +185,10 @@ const logoutUser = asynchandler(async (req, res) => {
     )
     const options = {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        secure: true,
+        sameSite: 'none',
         path: '/'
     }
-
-    // ℹ️ℹ️ℹ️ℹ️ IN  production
-    //     const options = {
-    //     httpOnly: true,
-    //     secure: process.env.NODE_ENV === "production"
-    // }
 
     return res
         .status(200)
@@ -227,17 +221,23 @@ const refreshAccessToken = asynchandler(async (req, res) => {
 
         const options = {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+            secure: true,
+            sameSite: 'none',
+            maxAge: 24 * 60 * 60 * 1000, // 1 day
             path: '/'
+        }
+
+        const refreshOptions = {
+            ...options,
+            maxAge: 10 * 24 * 60 * 60 * 1000 // 10 days
         }
 
         const { accessToken, refreshToken: newrefreshToken } = await generateAccessandRefreshToken(user._id)
 
         return res
             .status(200)
-            .cookie("refreshToken", newrefreshToken, options)
             .cookie("accessToken", accessToken, options)
+            .cookie("refreshToken", newrefreshToken, refreshOptions)
             .json(
                 new ApiResponse(200, { accessToken, refreshToken: newrefreshToken }, "accessToken  Refreshed")
             )

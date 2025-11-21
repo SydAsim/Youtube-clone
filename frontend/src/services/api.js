@@ -17,14 +17,13 @@
  */
 
 import axios from 'axios';
-import Cookies from 'js-cookie';
 
 // Create axios instance with default config
 // baseURL: All API calls will be prefixed with backend URL
 // withCredentials: Include cookies in cross-origin requests (needed for authentication)
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
-  withCredentials: true,  // Important: Sends cookies with every request
+  withCredentials: true,  // Important: Sends httpOnly cookies automatically with every request
   timeout: 15000,  // Increased to 15 seconds for network delays
   headers: {
     'Content-Type': 'application/json',
@@ -34,18 +33,13 @@ const api = axios.create({
 /* 
  * REQUEST INTERCEPTOR
  * Runs BEFORE every API request is sent
- * Use case: Add authorization token to headers
+ * Note: We don't need to manually add Authorization header because
+ * httpOnly cookies are sent automatically by the browser
  */
 api.interceptors.request.use(
   (config) => {
-    // Get access token from cookies
-    const token = Cookies.get('accessToken');
-
-    // If token exists, add it to Authorization header
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-
+    // Browser automatically sends httpOnly cookies with withCredentials: true
+    // No need to manually read or set Authorization header
     return config;
   },
   (error) => {
@@ -83,15 +77,11 @@ api.interceptors.response.use(
 
       try {
         // Try to refresh the access token
-        const refreshToken = Cookies.get('refreshToken');
+        // Refresh token is sent automatically via httpOnly cookie
+        await api.post('/users/accessrefreshtoken');
 
-        if (refreshToken) {
-          await api.post('/users/accessrefreshtoken', { refreshToken });
-
-
-          // Retry the original request
-          return api(originalRequest);
-        }
+        // Retry the original request
+        return api(originalRequest);
       } catch (refreshError) {
         // If refresh fails, redirect to login
         window.location.href = '/login';
