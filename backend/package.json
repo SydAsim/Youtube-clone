@@ -13,7 +13,8 @@
   "scripts": {
     "dev": "nodemon -r dotenv/config --experimental-json-modules index.js",
     "start": "node index.js",
-    "start:src": "node src/index.js"
+    "start:src": "node src/index.js",
+    "fix-urls": "node scripts/fixCloudinaryUrls.js"
   },
   "devDependencies": {
     "@flydotio/dockerfile": "^0.7.10",
