@@ -75,6 +75,12 @@ api.interceptors.response.use(
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
+      // Don't try to refresh if this is the getCurrentUser call (auth check)
+      // Just let it fail silently
+      if (originalRequest.url?.includes('/users/getCurrentUser')) {
+        return Promise.reject(error);
+      }
+
       try {
         // Try to refresh the access token
         // Refresh token is sent automatically via httpOnly cookie
