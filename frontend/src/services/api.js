@@ -83,8 +83,12 @@ api.interceptors.response.use(
         // Retry the original request
         return api(originalRequest);
       } catch (refreshError) {
-        // If refresh fails, redirect to login
-        window.location.href = '/login';
+        // If refresh fails, redirect to login (but only if not already there)
+        if (!window.location.pathname.includes('/login') && 
+            !window.location.pathname.includes('/register') &&
+            !window.location.pathname.includes('/forgot-password')) {
+          window.location.href = '/login';
+        }
         return Promise.reject(refreshError);
       }
     }

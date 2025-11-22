@@ -62,7 +62,16 @@ export const AuthProvider = ({ children }) => {
    * Dependency array [] means this runs once when component mounts
    */
   useEffect(() => {
-    checkAuth();
+    // Only check auth if not on public auth pages
+    const publicPaths = ['/login', '/register', '/forgot-password', '/reset-password'];
+    const isPublicPage = publicPaths.some(path => window.location.pathname.startsWith(path));
+    
+    if (!isPublicPage) {
+      checkAuth();
+    } else {
+      // On public pages, just set loading to false
+      setIsLoading(false);
+    }
   }, []);
 
   /**
