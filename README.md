@@ -1,10 +1,13 @@
 # YouTube Clone - Full Stack Application
 
+🔗 **Live Demo:** [https://youtube-clone-frontend-9y0g.onrender.com](https://youtube-clone-frontend-9y0g.onrender.com)
+
 A full-featured YouTube clone built with **React.js** frontend and **Node.js/Express** backend. This project demonstrates modern web development practices, API integration, authentication, and state management.
 
 ![YouTube Clone](https://img.shields.io/badge/YouTube-Clone-red?style=for-the-badge&logo=youtube)
 ![React](https://img.shields.io/badge/React-19.2.0-blue?style=for-the-badge&logo=react)
 ![Node.js](https://img.shields.io/badge/Node.js-Backend-green?style=for-the-badge&logo=node.js)
+![Live](https://img.shields.io/badge/Live-Demo-success?style=for-the-badge)
 
 ---
 
