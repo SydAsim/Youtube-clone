@@ -99,7 +99,7 @@ const Tweets = () => {
               value={newTweet}
               onChange={(e) => setNewTweet(e.target.value)}
               placeholder="What's on your mind?"
-              className="w-full bg-yt-black border border-yt-lighter rounded-lg p-3 focus:outline-none focus:border-yt-blue resize-none text-sm sm:text-base"
+              className="w-full bg-yt-black text-white border border-yt-lighter rounded-lg p-3 focus:outline-none focus:border-yt-blue resize-none text-sm sm:text-base placeholder:text-gray-500"
               rows="3"
             />
             <div className="flex justify-end mt-2 sm:mt-3">
@@ -133,7 +133,7 @@ const Tweets = () => {
                       <textarea
                         value={editContent}
                         onChange={(e) => setEditContent(e.target.value)}
-                        className="w-full bg-yt-black border border-yt-lighter rounded p-3 focus:outline-none focus:border-yt-blue resize-none text-sm sm:text-base"
+                        className="w-full bg-yt-black text-white border border-yt-lighter rounded p-3 focus:outline-none focus:border-yt-blue resize-none text-sm sm:text-base"
                         rows="3"
                       />
                       <div className="flex gap-2 mt-2">
