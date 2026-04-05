@@ -39,4 +39,5 @@ export {ApiError}
 //     at getUser (userController.js:15:9)
 //     at processRequest (server.js:42:13)
 // This helps you trace exactly where the error started.
-// You can manually pass a custom stack if needed (e.g., rethrowing or logging errors differently), which is why you have the parameter stack = "".
+// You can manually pass a custom stack if needed 
+// (e.g., rethrowing or logging errors differently), which is why you have the parameter stack = "".

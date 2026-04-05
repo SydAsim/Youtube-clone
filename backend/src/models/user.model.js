@@ -57,7 +57,7 @@ const userSchema = new Schema({
     },
     
     passwordResetExpires: {
-        type: Date
+        type: Date 
     }
 },
 
